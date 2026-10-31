@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Regression and Model Comparison — Learner Roadmap</title>
+  <style>
+    :root{--yellow:#F8DB59;--yellow-bright:#FEF800;--blue:#7FC3E1;--blue-light:#9CE4FF;--green:#2ECC71;--green-light:#87E7B0;--orange:#F3920F;--orange-light:#FFCA80;--ink:#111;--muted:#505862;--line:#D8DDE3;--paper:#fff;--canvas:#F6F6F2}
+    *{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    header{background:linear-gradient(125deg,var(--yellow),var(--yellow-bright));padding:28px clamp(18px,4vw,56px)}.hero{max-width:1180px;margin:auto}.brand,.kicker,.step-number{font-size:.76rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.brand{opacity:.8}.hero h1{font-size:clamp(1.8rem,4vw,3.1rem);line-height:1.08;margin:10px 0}.hero p{max-width:760px;margin:0;color:var(--muted)}
+    main{max-width:1180px;margin:24px auto 48px;padding:0 18px}.status{display:flex;gap:10px;align-items:center;border:1px solid #bfd3ea;background:#f4f9ff;border-radius:12px;padding:12px 15px;margin-bottom:18px}.dot{width:11px;height:11px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px #cceee0}.preview,.nav-card,.activity{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(33,53,76,.06)}.preview{padding:18px;margin-bottom:20px}.preview-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.preview h2{margin:0;font-size:1.1rem}.preview p{margin:4px 0 0;color:var(--muted);font-size:.92rem}.tag{white-space:nowrap;border-radius:999px;background:#e8f2ff;color:#1256a4;padding:5px 10px;font-weight:750;font-size:.78rem}.outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.outcome{padding:11px;border:1px solid var(--line);border-radius:10px;background:#fafcfe;font-size:.86rem}.outcome strong{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:#45546b;margin-bottom:3px}
+    .workspace{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}.nav-card{padding:16px;position:sticky;top:16px}.nav-card h2{font-size:1rem;margin:0}.track{height:9px;background:#e7ebf0;border-radius:99px;overflow:hidden;margin:12px 0 16px}.fill{height:100%;width:0;background:linear-gradient(90deg,#1769e0,#18a47a);transition:width .25s}.theme-nav{margin:13px 0 5px}.theme-head{font-size:.83rem;font-weight:800;color:#33425a}.step-link{display:block;padding:7px 9px;margin-top:5px;border-left:3px solid #d5dce5;border-radius:5px;color:#56657a;text-decoration:none;font-size:.78rem}.step-link:hover{background:var(--blue-light);border-color:var(--blue);color:#174e96}
+    .activity{overflow:hidden}.banner{background:linear-gradient(100deg,#edf5ff,#f7fbff);border-bottom:1px solid #cfe0f4;padding:18px 22px}.kicker,.step-number{color:#1559a5}.banner h2{margin:3px 0;font-size:1.25rem}.banner p{margin:0;color:#52647b;font-size:.92rem}.step{padding:23px;border-bottom:1px solid var(--line);scroll-margin-top:15px}.step:last-child{border-bottom:0}.step h3{font-size:1.4rem;margin:3px 0 8px}.instruction{color:#334158;margin-bottom:16px}.hint{border-left:4px solid #d68524;background:#fff1d7;padding:11px 13px;border-radius:7px;margin-bottom:14px;color:#75400f}.hint strong{display:block;color:#8a460a;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}.task{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:13px;margin:14px 0}.task h4{margin:0 0 5px;font-size:.9rem}.task p{margin:0;color:#45546b;font-size:.9rem}details{margin-top:14px;border:1px solid #bfd3ea;border-radius:9px;background:#f5f9ff;overflow:hidden}summary{cursor:pointer;padding:10px 12px;color:#164f91;font-weight:800}.code-wrap{border-top:1px solid #d5e4f5;padding:12px}.code-wrap p{margin:0 0 8px;color:#34445a;font-size:.9rem}pre{position:relative;margin:0;overflow:auto;background:#101826;color:#e9f1fb;border-radius:8px;padding:13px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}pre button{position:absolute;top:7px;right:7px;border:0;border-radius:6px;padding:4px 7px;background:#ffffff2c;color:#fff;font:700 .72rem inherit;cursor:pointer}.complete{display:block;width:100%;margin-top:16px;padding:10px;border:0;border-radius:8px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}.complete.done{background:var(--green-light);color:#126443}.reflection{display:none;margin-top:14px;padding:11px 13px;border-radius:7px;background:var(--green-light);border-left:4px solid var(--green);color:#126443}.reflection.show{display:block}.footer{text-align:center;color:#718096;font-size:.75rem;margin-top:22px}
+    @media(max-width:900px){.workspace{grid-template-columns:1fr}.nav-card{position:static}.outcomes{grid-template-columns:1fr}}@media(max-width:600px){.tag{display:none}.step{padding:18px}}@media print{.nav-card,.status,.complete{display:none}body{background:#fff}.activity{box-shadow:none}}
+  </style>
+</head>
+<body>
+  <header><div class="hero"><div class="brand">Decoded · Learner Roadmap</div><h1>Regression and model comparison</h1><p>Build a reliable bike-demand prediction workflow: establish a baseline, compare models fairly, tune one candidate and make a responsible recommendation.</p></div></header>
+  <main>
+    <div class="status"><span class="dot"></span><span><strong>Session ready.</strong> Work through each activity in the accompanying notebook. Mark a step complete once you have run it and can explain the result.</span></div>
+    <section class="preview"><div class="preview-head"><div><h2>Your scenario</h2><p>Seoul bike rental demand is the target. Use the supplied training data to learn, and reserve the test data for one final, unbiased check.</p></div><span class="tag">Regression · Seoul bike demand</span></div><div class="outcomes"><div class="outcome"><strong>By the end</strong>Compare candidate models with evidence, not a hunch.</div><div class="outcome"><strong>Files to use</strong><code>seoulbikefeaturetrain.csv</code> and matching labels; then the test pair.</div><div class="outcome"><strong>Tools</strong>pandas, NumPy, matplotlib and scikit-learn. PyCaret is an optional stretch.</div></div></section>
+    <div class="workspace">
+      <aside class="nav-card"><h2>Activity progress <span id="count">0/10</span></h2><div class="track"><div id="fill" class="fill"></div></div>
+        <div class="theme-nav"><div class="theme-head">Theme 1 — Prepare safely</div><a class="step-link" href="#s11">1.1 Load the split</a><a class="step-link" href="#s12">1.2 Check availability</a></div>
+        <div class="theme-nav"><div class="theme-head">Theme 2 — Benchmark</div><a class="step-link" href="#s21">2.1 Baseline</a><a class="step-link" href="#s22">2.2 Metrics</a></div>
+        <div class="theme-nav"><div class="theme-head">Theme 3 — Compare models</div><a class="step-link" href="#s31">3.1 Candidates</a><a class="step-link" href="#s32">3.2 First comparison</a></div>
+        <div class="theme-nav"><div class="theme-head">Theme 4 — Validate and tune</div><a class="step-link" href="#s41">4.1 Cross-validation</a><a class="step-link" href="#s42">4.2 Grid search</a></div>
+        <div class="theme-nav"><div class="theme-head">Theme 5 — Decide responsibly</div><a class="step-link" href="#s51">5.1 Final test</a><a class="step-link" href="#s52">5.2 Diagnose errors</a></div>
+      </aside>
+      <section class="activity">
+        <div class="banner"><div class="kicker">Session roadmap</div><h2>Build evidence one step at a time</h2><p>Each activity has a short task, a hint and sample code. Use the notebook to run the code; use this guide to focus your reasoning.</p></div>
+        <article class="step" id="s11"><div class="step-number">Sub-step 1.1</div><h3>Load the fixed train/test split</h3><p class="instruction">Read the four prepared CSV files. Print their shapes and preview the training features. Keep the target as a one-dimensional Series where practical.</p><div class="hint"><strong>Hint</strong>The test split is not a practice area. Do not fit, tune or compare models using it yet.</div><div class="task"><h4>Pause and reflect</h4><p>Before running code, predict what matching feature and label row counts should look like.</p></div><details><summary>Sample code — open to inspect and adapt</summary><div class="code-wrap"><pre><button>Copy</button><code>import pandas as pd
+X_train = pd.read_csv("seoulbikefeaturetrain.csv")
+X_test = pd.read_csv("seoulbikefeaturetest.csv")
+y_train = pd.read_csv("seoulbikefeaturetrainlabels.csv").squeeze()
+y_test = pd.read_csv("seoulbikefeaturetestlabels.csv").squeeze()
+print(X_train.shape, X_test.shape)</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">Nice work. You have protected the hold-out data.</div></article>
+        <article class="step" id="s12"><div class="step-number">Sub-step 1.2</div><h3>Check feature availability</h3><p class="instruction">Review the feature names. Identify a feature that might not be known when a future forecast is needed, and decide whether it should be removed.</p><div class="hint"><strong>Hint</strong>A feature that reveals an outcome after it occurs creates data leakage and makes evaluation unrealistically optimistic.</div><div class="task"><h4>Pause and reflect</h4><p>Write one sentence: “I would exclude ___ because ___.”</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>print(X_train.columns.tolist())
+print(X_train.dtypes)</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You can now explain what makes a feature usable at prediction time.</div></article>
+        <article class="step" id="s21"><div class="step-number">Sub-step 2.1</div><h3>Build the mean-prediction baseline</h3><p class="instruction">Fit a DummyRegressor that predicts the training mean for every row. This is your minimum standard, not a model to deploy.</p><div class="hint"><strong>Hint</strong>A useful model must beat the baseline on the metrics that matter to this problem.</div><div class="task"><h4>Pause and reflect</h4><p>If the baseline has a negative R² score on test data, is that necessarily an error? Explain.</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>from sklearn.dummy import DummyRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+baseline = DummyRegressor(strategy="mean").fit(X_train, y_train)
+baseline_pred = baseline.predict(X_test)
+print("MAE:", mean_absolute_error(y_test, baseline_pred))
+print("RMSE:", mean_squared_error(y_test, baseline_pred) ** 0.5)
+print("R²:", r2_score(y_test, baseline_pred))</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You have a meaningful minimum standard to beat.</div></article>
+        <article class="step" id="s22"><div class="step-number">Sub-step 2.2</div><h3>Choose how to read performance</h3><p class="instruction">Use MAE, RMSE and R² together when reporting results. Decide which error type would be most costly for bike operations.</p><div class="hint"><strong>Hint</strong>MAE is a typical absolute miss. RMSE gives extra weight to large misses. R² compares against predicting the mean; it is not accuracy.</div><div class="task"><h4>Pause and reflect</h4><p>Give one example where two models have similar MAE but one has a much worse RMSE.</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>def report_metrics(actual, predicted):
+    print(f"MAE:  {mean_absolute_error(actual, predicted):.2f}")
+    print(f"RMSE: {mean_squared_error(actual, predicted) ** 0.5:.2f}")
+    print(f"R²:   {r2_score(actual, predicted):.3f}")</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You can report performance without reducing it to one score.</div></article>
+        <article class="step" id="s31"><div class="step-number">Sub-step 3.1</div><h3>Fit contrasting models</h3><p class="instruction">Train linear, regularised linear and tree-based approaches. Start with an initial test comparison to understand their behaviour—but do not select a final winner yet.</p><div class="hint"><strong>Hint</strong>Linear Regression is an interpretable benchmark; trees and ensembles can represent more complex relationships.</div><div class="task"><h4>Pause and reflect</h4><p>Which model is easiest to explain to a non-technical stakeholder? Which may capture non-linear patterns better?</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+models = {"Linear": LinearRegression(), "Ridge": Ridge(alpha=1.0),
+          "Tree": DecisionTreeRegressor(random_state=42),
+          "Forest": RandomForestRegressor(n_estimators=150, random_state=42, n_jobs=-1),
+          "Boosting": GradientBoostingRegressor(random_state=42)}</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You have tested models that make different assumptions.</div></article>
+        <article class="step" id="s32"><div class="step-number">Sub-step 3.2</div><h3>Make an initial comparison</h3><p class="instruction">Fit each candidate and present a sorted results table. Treat the ranking as a learning checkpoint, not final model selection.</p><div class="hint"><strong>Hint</strong>One fortunate or unfortunate split can change the rankings. The next theme reduces that risk.</div><div class="task"><h4>Pause and reflect</h4><p>Pick the apparent winner. What evidence is still missing before you would recommend it?</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>rows = []
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    pred = model.predict(X_test)
+    rows.append([name, mean_absolute_error(y_test, pred),
+                 mean_squared_error(y_test, pred) ** 0.5, r2_score(y_test, pred)])
+initial_results = pd.DataFrame(rows, columns=["model", "MAE", "RMSE", "R2"])
+print(initial_results.sort_values("RMSE"))</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You have an initial comparison and a reason not to over-trust it.</div></article>
+        <article class="step" id="s41"><div class="step-number">Sub-step 4.1</div><h3>Cross-validate every candidate</h3><p class="instruction">Use the same five shuffled folds of the training data for every model. Compare mean RMSE and its spread across folds.</p><div class="hint"><strong>Hint</strong>Scikit-learn returns error scores as negative values because its scoring convention treats bigger as better. Reverse the sign before reporting them.</div><div class="task"><h4>Pause and reflect</h4><p>Complete: “Using the same folds is fair because ___.”</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>from sklearn.model_selection import KFold, cross_validate
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
+scoring = {"mae":"neg_mean_absolute_error", "rmse":"neg_root_mean_squared_error", "r2":"r2"}
+cv_rows = []
+for name, model in models.items():
+    scores = cross_validate(model, X_train, y_train, cv=cv, scoring=scoring, n_jobs=-1)
+    cv_rows.append([name, -scores["test_rmse"].mean(), scores["test_rmse"].std()])
+cv_results = pd.DataFrame(cv_rows, columns=["model", "mean_RMSE", "RMSE_sd"])</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You can now compare average performance and consistency.</div></article>
+        <article class="step" id="s42"><div class="step-number">Sub-step 4.2</div><h3>Tune one promising candidate</h3><p class="instruction">Select a candidate using cross-validation evidence, then search a small, purposeful Random Forest hyperparameter grid on training data only.</p><div class="hint"><strong>Hint</strong>Parameters are learned during fitting. Hyperparameters—such as tree depth—are set before fitting and chosen through validation.</div><div class="task"><h4>Pause and reflect</h4><p>Count the grid combinations. What trade-off would you make if the search took too long?</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>from sklearn.model_selection import GridSearchCV
+grid = {"n_estimators":[10,100], "max_depth":[None,5,10],
+        "min_samples_split":[2,5], "max_features":["sqrt",1.0]}
+search = GridSearchCV(RandomForestRegressor(random_state=42, n_jobs=-1),
+    grid, scoring="neg_root_mean_squared_error", cv=cv, n_jobs=-1, refit=True)
+search.fit(X_train, y_train)
+print(search.best_params_, -search.best_score_)</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You have tuned without spending the test set.</div></article>
+        <article class="step" id="s51"><div class="step-number">Sub-step 5.1</div><h3>Evaluate the selected model once</h3><p class="instruction">Take the best fitted model from the search and evaluate it on the held-out test set. Compare it with the baseline in plain language.</p><div class="hint"><strong>Hint</strong>The test result estimates unseen performance only because the test set was not used for selection or tuning.</div><div class="task"><h4>Pause and reflect</h4><p>Write a two-sentence result for an operations manager. Include a metric and its practical meaning.</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>final_model = search.best_estimator_
+final_pred = final_model.predict(X_test)
+print("Final model")
+report_metrics(y_test, final_pred)
+print("Baseline")
+report_metrics(y_test, baseline_pred)</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You have made the one final test-set check.</div></article>
+        <article class="step" id="s52"><div class="step-number">Sub-step 5.2</div><h3>Inspect errors and make a responsible decision</h3><p class="instruction">Review the largest residuals and compare training performance with test performance. State how the model should be monitored if adopted.</p><div class="hint"><strong>Hint</strong>Summary metrics can hide costly patterns. A large training-to-test gap may suggest overfitting; a small gap is encouraging but not a guarantee.</div><div class="task"><h4>Pause and reflect</h4><p>Name one condition shared by large errors, one operational risk, and one metric you would monitor each month.</p></div><details><summary>Sample code</summary><div class="code-wrap"><pre><button>Copy</button><code>import numpy as np
+residuals = y_test - final_pred
+error_review = X_test.copy()
+error_review["actual"] = y_test
+error_review["predicted"] = final_pred
+error_review["residual"] = residuals
+error_review["absolute_error"] = np.abs(residuals)
+print(error_review.sort_values("absolute_error", ascending=False).head(10))</code></pre></div></details><button class="complete">Mark complete</button><div class="reflection">You are ready to recommend a model with appropriate caveats.</div></article>
+      </section>
+    </div>
+    <div class="footer">Companion to <code>M6.1_RnC_learner_completed.ipynb</code> · Open locally in any modern browser.</div>
+  </main>
+  <script>
+    const buttons=document.querySelectorAll(".complete"), count=document.getElementById("count"), fill=document.getElementById("fill");
+    function update(){const n=[...buttons].filter(b=>b.classList.contains("done")).length;count.textContent=n+"/10";fill.style.width=(n*10)+"%"}
+    buttons.forEach(button=>button.addEventListener("click",()=>{button.classList.toggle("done");button.textContent=button.classList.contains("done")?"✓ Completed":"Mark complete";button.nextElementSibling.classList.toggle("show");update()}));
+    document.querySelectorAll("pre button").forEach(button=>button.addEventListener("click",async()=>{await navigator.clipboard.writeText(button.parentElement.querySelector("code").innerText);button.textContent="Copied";setTimeout(()=>button.textContent="Copy",1200)}));
+  </script>
+</body>
+</html>

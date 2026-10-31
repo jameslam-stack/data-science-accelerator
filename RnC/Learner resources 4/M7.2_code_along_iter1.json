@@ -1,0 +1,2222 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "2defdcc8",
+   "metadata": {
+    "id": "2defdcc8"
+   },
+   "source": [
+    "<img src=https://courseware.decoded.com/images/decoded/logo-decoded.png align=left width=100px/>\n",
+    "\n",
+    "# Regression and Classification: Evaluating Classification Models\n",
+    "---\n",
+    "<small>© COPYRIGHT 2026 DECODED LIMITED. ALL RIGHTS RESERVED. Web: https://decoded.com/ </small>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ca43609d",
+   "metadata": {
+    "id": "ca43609d"
+   },
+   "source": [
+    "\n",
+    "---\n",
+    "\n",
+    "### Summary\n",
+    "\n",
+    "In this chapter we explore how classification models are evaluated and compared in real-world machine learning workflows. Through a combination of theory, hands-on exercises, and practical examples, we will examine how to train multiple classification models, validate their performance using cross-validation, and optimise them using hyperparameter tuning. We will focus particularly on evaluating models in imbalanced datasets using precision and recall, comparing models against baseline performance, and interpreting results in a policy or decision-making context.\n",
+    "\n",
+    "\n",
+    "### Learning Objectives\n",
+    "\n",
+    "* Understand how classification models are trained and evaluated in a machine learning workflow\n",
+    "* Recognise the challenges posed by **imbalanced datasets** and why accuracy can be misleading\n",
+    "* Train multiple classification models including logistic regression, decision trees, and random forests\n",
+    "* Apply **train–test splitting** and understand the importance of evaluating models on unseen data\n",
+    "* Use **cross-validation** to estimate model performance and assess model stability\n",
+    "* Compare models using appropriate metrics such as **precision and recall**\n",
+    "* Perform **hyperparameter tuning using GridSearchCV** to optimise model performance\n",
+    "* Understand the purpose of **baseline models** and compare trained models against random prediction\n",
+    "* Interpret classification model performance using confusion matrices and evaluation metrics\n",
+    "* Connect model evaluation results to **practical decision-making contexts**\n",
+    "\n",
+    "\n",
+    "\n",
+    "### Overview\n",
+    "\n",
+    "[**Understanding the classification problem**](#classification_problem)\n",
+    "\n",
+    "* What is the prediction task?\n",
+    "* Why is this a classification problem?\n",
+    "* What challenges arise when the dataset is imbalanced?\n",
+    "* *Challenge*: Explore the class distribution\n",
+    "\n",
+    "[**Preparing data for model training**](#data_preparation)\n",
+    "\n",
+    "* Why do we split data into training and test sets?\n",
+    "* What is stratified sampling?\n",
+    "* How does train–test splitting prevent data leakage?\n",
+    "* *Demo*: Use `train_test_split()` in `sklearn`\n",
+    "\n",
+    "[**Training classification models**](#model_training)\n",
+    "\n",
+    "* What are logistic regression, decision trees, and random forests?\n",
+    "* Why train multiple models?\n",
+    "* How do models learn patterns from training data?\n",
+    "* *Demo*: Train models using `sklearn` classifiers\n",
+    "\n",
+    "[**Evaluating models with cross-validation**](#cross_validation)\n",
+    "\n",
+    "* What is cross-validation?\n",
+    "* Why do we evaluate models across multiple folds?\n",
+    "* How do we interpret variation in model performance?\n",
+    "* *Challenge*: Compare cross-validation scores\n",
+    "\n",
+    "[**Improving models with hyperparameter tuning**](#hyperparameter_tuning)\n",
+    "\n",
+    "* What are hyperparameters?\n",
+    "* How does grid search help improve model performance?\n",
+    "* How does `GridSearchCV` work?\n",
+    "* *Demo*: Tune classification models using `GridSearchCV`\n",
+    "\n",
+    "[**Comparing models objectively**](#model_comparison)\n",
+    "\n",
+    "* How do we compare multiple trained models?\n",
+    "* Why visualise cross-validation scores?\n",
+    "* What does a boxplot of model performance tell us?\n",
+    "* *Challenge*: Compare model stability and performance\n",
+    "\n",
+    "[**Using baseline models for context**](#baseline_models)\n",
+    "\n",
+    "* What is a baseline model?\n",
+    "* Why compare models against random predictions?\n",
+    "* How do we implement a `DummyClassifier`?\n",
+    "* *Challenge*: Evaluate baseline performance\n",
+    "\n",
+    "[**Evaluating the final model**](#final_model_evaluation)\n",
+    "\n",
+    "* Why must the final model be evaluated on the test set?\n",
+    "* What are precision and recall?\n",
+    "* How do we interpret confusion matrix outcomes?\n",
+    "* *Challenge*: Interpret model predictions in context\n",
+    "\n",
+    "\n",
+    "\n",
+    "### Introductions\n",
+    "\n",
+    "#### Purpose: What is the aim of the content?\n",
+    "\n",
+    "The purpose of this workshop is to develop a clear understanding of how classification models are evaluated and compared in practice. While training models is an important step in machine learning, selecting the most appropriate model requires careful evaluation using appropriate metrics and validation techniques. In this lesson, learners will explore how to compare multiple models, apply cross-validation, optimise models through hyperparameter tuning, and interpret performance metrics such as precision and recall. These skills are essential for building reliable models that support real-world decision-making.\n",
+    "\n",
+    "\n",
+    "\n",
+    "#### Objectives: What will I learn?\n",
+    "\n",
+    "* Understand the workflow for training and evaluating classification models\n",
+    "* Recognise the impact of class imbalance on model evaluation\n",
+    "* Train and compare multiple classification algorithms\n",
+    "* Apply cross-validation to estimate model performance\n",
+    "* Perform hyperparameter tuning using grid search\n",
+    "* Evaluate models using precision and recall metrics\n",
+    "* Implement baseline models for meaningful comparison\n",
+    "* Interpret classification outcomes using confusion matrices\n",
+    "* Connect model evaluation results to real-world decision contexts\n",
+    "\n",
+    "\n",
+    "#### Process: How will I learn this content?\n",
+    "\n",
+    "Throughout the workshop, we will:\n",
+    "\n",
+    "* explore concepts through short explanations and examples\n",
+    "* train and evaluate models using Python and `scikit-learn`\n",
+    "* compare model performance using visualisations and metrics\n",
+    "* complete guided exercises and challenges\n",
+    "* discuss how evaluation results inform real-world decisions\n",
+    "\n",
+    "\n",
+    "\n",
+    "#### Applications: Why study this?\n",
+    "\n",
+    "Classification models are widely used to support decision-making across many domains, including finance, healthcare, public policy, marketing, and social research. However, selecting a model based solely on accuracy can lead to misleading conclusions, particularly when datasets are imbalanced. Understanding how to properly evaluate classification models using metrics such as precision and recall allows analysts to assess the real impact of model predictions. These evaluation techniques help ensure that machine learning models provide meaningful insights and reliable support for policy, business, and operational decisions.\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4e399c2c",
+   "metadata": {
+    "id": "4e399c2c"
+   },
+   "source": [
+    "\n",
+    "---\n",
+    "# Problem Statement\n",
+    "---\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "We are building a **classification model** to predict whether an individual or household is likely to experience **residential out-migration**. In this context, the target variable (Y) represents a binary outcome:\n",
+    "\n",
+    "* **(Y = 1)** indicates that a person or household leaves the area (out-migration)\n",
+    "* **(Y = 0)** indicates that they remain in the area\n",
+    "\n",
+    "The model uses a range of explanatory features to estimate the probability that an individual belongs to one of these two categories. These features may include demographic, economic, or housing-related characteristics that help explain patterns of residential mobility.\n",
+    "\n",
+    "The purpose of this model is not simply to make predictions, but to **support policy decision-making**. In particular, the model is designed to help identify groups or areas where the risk of out-migration is higher. These insights can then be used to inform **targeted interventions under the Programme for Government**, such as initiatives aimed at retaining graduates, supporting housing stability, or strengthening regional economic opportunities.\n",
+    "\n",
+    "Because policy resources are limited, the model must be evaluated carefully to ensure that interventions are directed toward individuals who are genuinely at risk of leaving. This is why metrics such as **precision and recall** become important. Precision helps ensure that resources are not wasted on individuals who would not have left anyway, while recall measures how effectively the model identifies those who are truly at risk.\n",
+    "\n",
+    "In this lesson, we will explore how classification models can be trained, validated, and evaluated in order to support this type of evidence-based policy decision-making.\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Data dictionary\n",
+    "\n",
+    "All feature columns are continuous, standardised numerical scores. A value near `0` represents the dataset average, positive values are above average, and negative values are below average.\n",
+    "\n",
+    "| Column                                 | Role       |           Data type | Description                                                                                                                    | Higher values indicate                          |\n",
+    "| -------------------------------------- | ---------- | ------------------: | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |\n",
+    "| `young_adult_profile_score`            | Feature    |               Float | Represents the extent to which the resident or household matches the characteristics associated with a young-adult population. | A stronger young-adult profile                  |\n",
+    "| `household_income_score`               | Feature    |               Float | Represents the relative income position of the household compared with others in the dataset.                                  | A higher relative household income              |\n",
+    "| `qualification_level_score`            | Feature    |               Float | Represents the resident’s or household’s relative level of educational qualifications.                                         | Higher qualification levels                     |\n",
+    "| `housing_affordability_pressure_score` | Feature    |               Float | Represents the level of financial pressure created by housing costs relative to the resident’s circumstances.                  | Greater housing affordability pressure          |\n",
+    "| `employment_stability_score`           | Feature    |               Float | Represents the stability and continuity of employment associated with the profile.                                             | More stable employment                          |\n",
+    "| `housing_tenure_instability_score`     | Feature    |               Float | Represents the extent to which the resident’s housing situation may be temporary, insecure or subject to change.               | Greater housing instability                     |\n",
+    "| `public_service_access_score`          | Feature    |               Float | Represents relative access to services such as healthcare, education, childcare and other public provision.                    | Better access to public services                |\n",
+    "| `transport_connectivity_score`         | Feature    |               Float | Represents how well connected the resident’s area is through public transport or wider transport infrastructure.               | Better transport connectivity                   |\n",
+    "| `limited_local_job_opportunity_score`  | Feature    |               Float | Represents the extent to which suitable employment opportunities are limited within the local area.                            | Fewer suitable local job opportunities          |\n",
+    "| `recent_graduate_profile_score`        | Feature    |               Float | Represents the extent to which the profile has characteristics associated with a recent graduate.                              | A stronger recent-graduate profile              |\n",
+    "| `household_dependency_score`           | Feature    |               Float | Represents the level of caring, family or financial dependencies associated with the household.                                | Greater household dependency                    |\n",
+    "| `community_attachment_score`           | Feature    |               Float | Represents the resident’s relative connection to their local community, including social, family or place-based ties.          | Stronger attachment to the local community      |\n",
+    "| `residential_out_migration`            | **Target** | Integer: `0` or `1` | Records whether the resident or household remained in the area or experienced residential out-migration.                       | `0` = remained in the area; `1` = left the area |\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9fb30339",
+   "metadata": {
+    "id": "9fb30339"
+   },
+   "source": [
+    "## Imports for the Notebook"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "3375debd",
+   "metadata": {
+    "facilitator_solution": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nfrom sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score, cross_validate, StratifiedKFold\nfrom sklearn.metrics import (\n    accuracy_score, precision_score, recall_score, f1_score,\n    confusion_matrix, ConfusionMatrixDisplay,\n    roc_curve, roc_auc_score,\n    precision_recall_curve, auc\n)\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import ConfusionMatrixDisplay\nfrom sklearn.dummy import DummyClassifier\nfrom sklearn.metrics import confusion_matrix, precision_score, recall_score\nfrom sklearn.metrics import average_precision_score, roc_auc_score\nimport matplotlib.pyplot as plt\nfrom sklearn.metrics import ConfusionMatrixDisplay\n",
+    "id": "3375debd",
+    "slideshow": {
+     "slide_type": "slide"
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt\n",
+    "from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score, cross_validate, StratifiedKFold\n",
+    "from sklearn.metrics import (\n",
+    "    accuracy_score, precision_score, recall_score, f1_score,\n",
+    "    confusion_matrix, ConfusionMatrixDisplay,\n",
+    "    roc_curve, roc_auc_score,\n",
+    "    precision_recall_curve, auc\n",
+    ")\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.tree import DecisionTreeClassifier\n",
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.metrics import ConfusionMatrixDisplay\n",
+    "from sklearn.dummy import DummyClassifier\n",
+    "from sklearn.metrics import confusion_matrix, precision_score, recall_score\n",
+    "from sklearn.metrics import average_precision_score, roc_auc_score\n",
+    "import matplotlib.pyplot as plt\n",
+    "from sklearn.metrics import ConfusionMatrixDisplay\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dcb29ef3",
+   "metadata": {
+    "id": "dcb29ef3"
+   },
+   "source": [
+    "### Importing the Dataset"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e9f517ad",
+   "metadata": {
+    "facilitator_solution": "df = pd.read_csv('residential_out_migration_classification.csv')",
+    "id": "e9f517ad",
+    "jp-MarkdownHeadingCollapsed": true,
+    "slideshow": {
+     "slide_type": "skip"
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Read the data file</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "#### Read the data file - \"residential_out_migration.csv\"\n",
+    "\n",
+    "```python\n",
+    "df = pd.read_csv(\"__________\")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e9f517ad_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "df = pd.read_csv('residential_out_migration_classification.csv')\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5d70faab",
+   "metadata": {
+    "facilitator_solution": "df.head()",
+    "id": "5d70faab",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Examine a few columns</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "#### Examine a few columns\n",
+    "\n",
+    "```python\n",
+    "df.__________()\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5d70faab_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "df.head()\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7207caad",
+   "metadata": {
+    "facilitator_solution": "y = df[\"residential_out_migration\"]\nX = df.drop(columns=[\"residential_out_migration\"])",
+    "id": "7207caad",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Split data into feature and target</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "#### Split our data to feature and target\n",
+    "\n",
+    "```python\n",
+    "y = df[\"__________\"]\n",
+    "X = df.drop(columns=[\"__________\"])\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7207caad_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "y = df[\"residential_out_migration\"]\n",
+    "X = df.drop(columns=[\"residential_out_migration\"])\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "146c9994-e32f-4a22-811b-5600d2d6af10",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true
+   },
+   "source": [
+    "##### Hints / Solution"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "7d82d425-cc10-4e95-9de7-d94109f70d32",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv('residential_out_migration_classification.csv')\n",
+    "y = df[\"residential_out_migration\"]\n",
+    "X = df.drop(columns=[\"residential_out_migration\"])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a02a1387",
+   "metadata": {
+    "id": "a02a1387"
+   },
+   "source": [
+    "##  Looking at the Class Distribution\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9d6217a0",
+   "metadata": {
+    "id": "9d6217a0"
+   },
+   "source": [
+    "It appears that the dataset is imbalanced, so as mentioned earlier the - accuracy is not a good metric to evaluate the model performance. We will use precision as our primary metric to evaluate the model performance."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "84a3b4bb",
+   "metadata": {
+    "facilitator_solution": "y.value_counts().plot(kind='bar')\nplt.title('Migration Distribution')\nplt.show()",
+    "id": "84a3b4bb",
+    "jp-MarkdownHeadingCollapsed": true,
+    "slideshow": {
+     "slide_type": "skip"
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Plot class distribution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "##### We use count plot to display the distribution here \n",
+    "```python\n",
+    "y.__________().plot(kind=\"__________\")\n",
+    "plt.title(\"__________\")\n",
+    "plt.show()\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "84a3b4bb_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "y.value_counts().plot(kind='bar')\n",
+    "plt.title('Migration Distribution')\n",
+    "plt.show()\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "806af0c8",
+   "metadata": {
+    "id": "806af0c8"
+   },
+   "source": [
+    "## Train/Test Split\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3699f516",
+   "metadata": {
+    "id": "3699f516"
+   },
+   "source": [
+    "Now we will split the data into a training set and a test set. The training set will be used to train the model, and the test set will be used to evaluate the model's performance on unseen data. Remember:\n",
+    "\n",
+    "- stratify the split to maintain the class distribution in both sets. Since the dataset is imbalanced\n",
+    "- do not toouch the test set in any way until the final evaluation step. The test set should only be used once to evaluate the final model performance."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "661bf246_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Train/Test Split</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "X_train, X_test, y_train, y_test = train_test_split(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    test_size=__________,\n",
+    "    stratify=__________,\n",
+    "    random_state=__________\n",
+    ")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "661bf246_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.3, stratify=y, random_state=42)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "661bf246",
+   "metadata": {
+    "facilitator_solution": "X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.3, stratify=y, random_state=42)",
+    "id": "661bf246",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "X_train, X_test, y_train, y_test = train_test_split(\n",
+    "    X,\n",
+    "    y,\n",
+    "    test_size=0.3,\n",
+    "    stratify=y,\n",
+    "    random_state=42\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "54b713dc",
+   "metadata": {
+    "id": "54b713dc"
+   },
+   "source": [
+    "## Model Fitting\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "72d61cf9",
+   "metadata": {
+    "id": "72d61cf9"
+   },
+   "source": [
+    "Let us first instantiate our classifcation models"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4bad9693_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Instantiate Classification Models</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# let's do guess here\n",
+    "# lr = logistic regression ; dt = decision tree ; rf = random forest\n",
+    "\n",
+    "model_lr = __________()\n",
+    "model_dt = __________(random_state=__________)\n",
+    "model_rf = __________(random_state=__________)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4bad9693_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "model_lr = LogisticRegression()\n",
+    "model_dt = DecisionTreeClassifier(random_state=42)\n",
+    "model_rf = RandomForestClassifier(random_state=42)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4bad9693",
+   "metadata": {
+    "facilitator_solution": "model_lr = LogisticRegression()\nmodel_dt = DecisionTreeClassifier(random_state=42)\nmodel_rf = RandomForestClassifier(random_state=42)",
+    "id": "4bad9693",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "model_lr = LogisticRegression()\n",
+    "model_dt = DecisionTreeClassifier(random_state=42)\n",
+    "model_rf = RandomForestClassifier(random_state=42)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d832443f",
+   "metadata": {
+    "id": "d832443f"
+   },
+   "source": [
+    "we will fit our models"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "172cebb1_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Fit Classification Models</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# How do we fit our model here?\n",
+    "model_lr.__________(__________, __________)\n",
+    "model_dt.__________(__________, __________)\n",
+    "model_rf.__________(__________, __________)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "172cebb1_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "model_lr.fit(X_train, y_train)\n",
+    "model_dt.fit(X_train, y_train)\n",
+    "model_rf.fit(X_train, y_train)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "172cebb1",
+   "metadata": {
+    "facilitator_solution": "model_lr.fit(X_train, y_train)\nmodel_dt.fit(X_train, y_train)\nmodel_rf.fit(X_train, y_train)",
+    "id": "172cebb1",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "model_lr.fit(X_train, y_train)\n",
+    "model_dt.fit(X_train, y_train)\n",
+    "model_rf.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "365f0536",
+   "metadata": {
+    "id": "365f0536"
+   },
+   "source": [
+    "In the next section we jump straight to cross validation as the single train/test split is not enough to evaluate the models. (remeber, our  model might get lucky with the train/test split so we do k-folds cross validation to get a better estimate of the model performance)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ef317f2c",
+   "metadata": {
+    "id": "ef317f2c"
+   },
+   "source": [
+    "\n",
+    "---\n",
+    "# Selecting Our Evaluation Metric For This Problem\n",
+    "---\n",
+    "\n",
+    "\n",
+    "\n",
+    "## Policy Context\n",
+    "\n",
+    "We are predicting **residential out-migration (Y=1)** to inform targeted interventions under the Programme for Government.\n",
+    "\n",
+    "Public funds are limited. Every intervention must be defensible.\n",
+    "\n",
+    "---\n",
+    "## Cost of Errors\n",
+    "---\n",
+    "\n",
+    "### False Positive (FP)\n",
+    "\n",
+    "We intervene, but the resident would have stayed anyway.\n",
+    "\n",
+    "**Cost:**\n",
+    "\n",
+    "* Deadweight loss (wasted subsidy)\n",
+    "* Reduced funds for genuine cases\n",
+    "* Audit and accountability risk\n",
+    "\n",
+    "This is an **immediate, measurable fiscal cost**.\n",
+    "\n",
+    "### False Negative (FN)\n",
+    "\n",
+    "We fail to intervene, and the resident leaves.\n",
+    "\n",
+    "**Cost:**\n",
+    "\n",
+    "* Long-term economic and demographic impact\n",
+    "* Harder to measure directly in the short term\n",
+    "\n",
+    "This is a **strategic, longer-term cost**.\n",
+    "\n",
+    "\n",
+    "---\n",
+    "\n",
+    "## Why Precision Is Prioritised\n",
+    "---\n",
+    "\n",
+    "\n",
+    "Precision answers:\n",
+    "\n",
+    "> “When we intervene, how often are we correct?”\n",
+    "\n",
+    "High precision ensures:\n",
+    "\n",
+    "* Interventions are tightly targeted\n",
+    "* Public money is not wasted\n",
+    "* Decisions withstand scrutiny\n",
+    "\n",
+    "In a budget-constrained public sector environment, avoiding expenditure on ineffective interventions is crucial.\n",
+    "\n",
+    "---\n",
+    "## Policy Trade-Off\n",
+    "---\n",
+    "\n",
+    "We accept:\n",
+    "\n",
+    "* Some at-risk residents may not be identified (lower recall)\n",
+    "\n",
+    "In exchange for:\n",
+    "\n",
+    "* High confidence that funded interventions are justified\n",
+    "\n",
+    "This is a deliberate choice to prioritise **resource efficiency and accountability**.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1744c014",
+   "metadata": {
+    "id": "1744c014"
+   },
+   "source": [
+    "## Cross-Validation\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b58a5d43",
+   "metadata": {
+    "id": "b58a5d43"
+   },
+   "source": [
+    "#### Unique feature of cross-validation in classification problem\n",
+    "\n",
+    "* Unlike regression we have to consider class balance so we will use stratified k folds instead of the usual kfolds"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "16e92ca1-32cb-45dc-bf57-6b1e57c4df62",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Copy and paste the cell here to a new code cell to set up our cross validation</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# Set up the Kfold cross validation\n",
+    "strat_kfolds = StratifiedKFold(\n",
+    "    n_splits=__________,\n",
+    "    shuffle=__________,\n",
+    "    random_state=__________\n",
+    ")\n",
+    "```\n",
+    "\n",
+    "```python\n",
+    "# Cross-validation for Logistic Regression model\n",
+    "cv_scores_lr = cross_validate(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    cv=__________,\n",
+    "    scoring=(\"__________\", \"__________\")\n",
+    ")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a36914c8-a6e8-4d83-9cd0-d26d7a04fa82",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>🔍 Copy and paste the cell in a new cell to display the summary</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "### Display the cross validation result as a dataframe \n",
+    "cv_results_lr = pd.__________(__________)\n",
+    "### print the summary statistics here\n",
+    "print(cv_results_lr.__________())\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cc3696f6-e30a-4330-9e11-b8990e9c3e9b",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>🔍 Want some tips/hints here?</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# consider class imbalance and use stratified k-fold cross-validation\n",
+    "strat_kfolds = StratifiedKFold(n_splits=5,shuffle=True,random_state=42)\n",
+    "# Cross-validation for Logistic Regression model\n",
+    "cv_scores_lr = cross_validate(model_lr, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\" ))\n",
+    "# Present your cv scores in a dataframe\n",
+    "cv_results_lr = pd.DataFrame(cv_scores_lr)\n",
+    "# write your summary statistics\n",
+    "print(cv_results_lr.describe())\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "b265f145-6035-4758-995c-a4ccce3f6396",
+   "metadata": {
+    "jupyter": {
+     "source_hidden": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# consider class imbalance and use stratified k-fold cross-validation\n",
+    "strat_kfolds = StratifiedKFold(n_splits=5,shuffle=True,random_state=42)\n",
+    "# Cross-validation for Logistic Regression model\n",
+    "cv_scores_lr = cross_validate(model_lr, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\" ))\n",
+    "# Present your cv scores in a dataframe\n",
+    "cv_results_lr = pd.DataFrame(cv_scores_lr)\n",
+    "# write your summary statistics\n",
+    "print(cv_results_lr.describe())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a846cac6-1ef5-4fce-9cdf-057ce089bdbf",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Practise with Decision Tree model</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# cross-validation for Decision Tree model\n",
+    "cv_scores_dt = cross_validate(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    cv=__________,\n",
+    "    scoring=(\"__________\", \"__________\")\n",
+    ")\n",
+    "\n",
+    "# Convert to dataframe\n",
+    "cv_results_dt = pd.__________(__________)\n",
+    "\n",
+    "# Print descriptive statistics\n",
+    "print(cv_results_dt.__________())\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a846cac6_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution for Decision Tree CV</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "cv_scores_dt = cross_validate(model_dt, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\"))\n",
+    "cv_results_dt = pd.DataFrame(cv_scores_dt)\n",
+    "print(cv_results_dt.describe())\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c5d2dd70",
+   "metadata": {
+    "facilitator_solution": "# cross-validation for Decision Tree model\ncv_scores_dt = cross_validate(model_dt, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\"))\ncv_results_dt = pd.DataFrame(cv_scores_dt)\nprint(cv_results_dt.describe())",
+    "id": "c5d2dd70",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "cv_scores_dt = cross_validate(model_dt, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\"))\n",
+    "cv_results_dt = pd.DataFrame(cv_scores_dt)\n",
+    "print(cv_results_dt.describe())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c5d2dd70_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Practise with random forest model</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# cross-validation for Random Forest model\n",
+    "cv_scores_rf = cross_validate(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    cv=__________,\n",
+    "    scoring=(\"__________\", \"__________\")\n",
+    ")\n",
+    "cv_results_rf = pd.__________(__________)\n",
+    "print(cv_results_rf.__________())\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c5d2dd70_rf_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution for Random Forest CV</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "cv_scores_rf = cross_validate(model_rf, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\"))\n",
+    "cv_results_rf = pd.DataFrame(cv_scores_rf)\n",
+    "print(cv_results_rf.describe())\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "75f085bc",
+   "metadata": {
+    "facilitator_solution": "cv_scores_rf = cross_validate(model_rf, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\"))\ncv_results_rf = pd.DataFrame(cv_scores_rf)\nprint(cv_results_rf.describe())",
+    "id": "75f085bc",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "cv_scores_rf = cross_validate(model_rf, X_train, y_train, cv=strat_kfolds, scoring=(\"precision\",\"recall\"))\n",
+    "cv_results_rf = pd.DataFrame(cv_scores_rf)\n",
+    "print(cv_results_rf.describe())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c5461ebc",
+   "metadata": {
+    "id": "c5461ebc"
+   },
+   "source": [
+    "#### An alternative presentation of your precision scores across different models\n",
+    "\n",
+    "* We can manually cross reference the precision scores across the different models,\n",
+    "* We can use boxplots to visualise the distribution of precision scores across the different models."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "21d67f46_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Combine CV Precision Results & Plot Boxplot</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# group your cross validation results into one single dataframe\n",
+    "cv_results = pd.concat(\n",
+    "    [\n",
+    "        cv_results_lr[\"__________\"],\n",
+    "        cv_results_dt[\"__________\"],\n",
+    "        cv_results_rf[\"__________\"]\n",
+    "    ],\n",
+    "    axis=__________\n",
+    ")\n",
+    "\n",
+    "# create a box plot\n",
+    "cv_results.__________()\n",
+    "\n",
+    "plt.title(\"__________\")\n",
+    "plt.ylabel(\"__________\")\n",
+    "plt.xlabel(\"__________\")\n",
+    "plt.xticks(\n",
+    "    [1, 2, 3],\n",
+    "    [\"__________\", \"__________\", \"__________\"]\n",
+    ")\n",
+    "plt.show()\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "21d67f46_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "cv_results = pd.concat([cv_results_lr[\"test_precision\"], cv_results_dt[\"test_precision\"], cv_results_rf[\"test_precision\"]], axis=1)\n",
+    "cv_results.boxplot()\n",
+    "\n",
+    "plt.title('Cross-Validation Precision Scores')\n",
+    "plt.ylabel('Precision')\n",
+    "plt.xlabel('Model')\n",
+    "plt.xticks([1, 2, 3], ['Logistic Regression', 'Decision Tree', 'Random Forest'])\n",
+    "plt.show()\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "21d67f46",
+   "metadata": {
+    "facilitator_solution": "cv_results = pd.concat([cv_results_lr[\"test_precision\"],cv_results_dt[\"test_precision\"],cv_results_rf[\"test_precision\"]],axis=1)\ncv_results.boxplot()\nplt.title('Cross-Validation Precision Scores')\nplt.ylabel('Precision')\nplt.xlabel('Model')\nplt.xticks([1, 2, 3], ['Logistic Regression', 'Decision Tree', 'Random Forest'])\nplt.show()",
+    "id": "21d67f46",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "cv_results = pd.concat([cv_results_lr[\"test_precision\"], cv_results_dt[\"test_precision\"], cv_results_rf[\"test_precision\"]], axis=1)\n",
+    "cv_results.boxplot()\n",
+    "plt.title('Cross-Validation Precision Scores')\n",
+    "plt.ylabel('Precision')\n",
+    "plt.xlabel('Model')\n",
+    "plt.xticks([1, 2, 3], ['Logistic Regression', 'Decision Tree', 'Random Forest'])\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "aad30c14",
+   "metadata": {
+    "id": "aad30c14"
+   },
+   "source": [
+    "Based on intital fits, the decision decision tree appears to have a much harder time being consistent in its precision scores. But remember, the intial fits are just that - initial. We will need to do hyperparameter tuning to see if we can improve the performance of our models"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a3659d34",
+   "metadata": {
+    "id": "a3659d34"
+   },
+   "source": [
+    "## Hyperparameter Tuning"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "14c827e2",
+   "metadata": {
+    "id": "14c827e2"
+   },
+   "source": [
+    "* Now you have picked the best model\n",
+    "* Next step is to optimise the parameters of your chosen model\n",
+    "* This process is called hyperparameter tuning"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "584639e3_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Define Logistic Regression Parameter Grid & GridSearch</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# Define the parameter grid for Logistic Regression model\n",
+    "param_grid_lr = {\n",
+    "    \"C\": __________,\n",
+    "    \"l1_ratio\": __________,\n",
+    "    \"solver\": __________\n",
+    "}\n",
+    "\n",
+    "grid_lr = GridSearchCV(\n",
+    "    __________(),\n",
+    "    __________,\n",
+    "    cv=__________,\n",
+    "    scoring=\"__________\"\n",
+    ")\n",
+    "grid_lr.__________(__________, __________)\n",
+    "best_model_lr = grid_lr.__________\n",
+    "print(\"Best parameters:\", grid_lr.__________)\n",
+    "print(\"Best PR AUC (Logistic Regression):\", grid_lr.__________)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "584639e3_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "param_grid_lr = {\n",
+    "    'C': [0.01, 0.1, 1, 10, 100],\n",
+    "    'penalty': ['l1', 'l2'],\n",
+    "    'solver': ['liblinear']\n",
+    "}\n",
+    "grid_lr = GridSearchCV(\n",
+    "    LogisticRegression(),\n",
+    "    param_grid_lr,\n",
+    "    cv=strat_kfolds,\n",
+    "    scoring=\"average_precision\"\n",
+    ")\n",
+    "grid_lr.fit(X_train, y_train)\n",
+    "best_model_lr = grid_lr.best_estimator_\n",
+    "print('Best parameters:', grid_lr.best_params_)\n",
+    "print('Best PR AUC (Logistic Regression):', grid_lr.best_score_)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "584639e3",
+   "metadata": {
+    "facilitator_solution": "param_grid_lr = {\n    'C': [0.01, 0.1, 1, 10, 100],\n    'penalty': ['l1', 'l2'],\n    'solver': ['liblinear']\n}\ngrid_lr = GridSearchCV(\n    LogisticRegression(),\n    param_grid_lr,\n    cv=strat_kfolds,\n    scoring=\"average_precision\"\n)\ngrid_lr.fit(X_train, y_train)\nbest_model_lr = grid_lr.best_estimator_\nprint('Best parameters:', grid_lr.best_params_)\nprint('Best PR AUC (Logistic Regression):', grid_lr.best_score_)",
+    "id": "584639e3",
+    "jupyter": {
+     "source_hidden": true
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "param_grid_lr = {\n",
+    "    'C': [0.01, 0.1, 1, 10, 100],\n",
+    "    'penalty': ['l1', 'l2'],\n",
+    "    'solver': ['liblinear']\n",
+    "}\n",
+    "grid_lr = GridSearchCV(\n",
+    "    LogisticRegression(),\n",
+    "    param_grid_lr,\n",
+    "    cv=strat_kfolds,\n",
+    "    scoring=\"average_precision\"\n",
+    ")\n",
+    "grid_lr.fit(X_train, y_train)\n",
+    "best_model_lr = grid_lr.best_estimator_\n",
+    "print('Best parameters:', grid_lr.best_params_)\n",
+    "print('Best PR AUC (Logistic Regression):', grid_lr.best_score_)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a39a8357",
+   "metadata": {
+    "id": "a39a8357"
+   },
+   "source": [
+    "* Additional resources on defining parameter grid can be found [here](https://codesignal.com/learn/courses/intro-to-model-optimization-in-machine-learning/lessons/hyperparameter-tuning-in-logistic-regressions)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "820daccd_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Random Forest Parameter Grid & GridSearch</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# Next we show the parameter grid for Random Forest model\n",
+    "param_grid_rf = {\n",
+    "    \"n_estimators\": __________,       # number of trees in the forest\n",
+    "    \"max_depth\": __________,          # maximum depth of each tree (controls complexity)\n",
+    "    \"min_samples_split\": __________,  # minimum number of samples required to split a node\n",
+    "    \"min_samples_leaf\": __________    # minimum number of samples required in a leaf node\n",
+    "}\n",
+    "\n",
+    "grid_rf = GridSearchCV(\n",
+    "    __________(random_state=__________),\n",
+    "    __________,\n",
+    "    cv=__________,\n",
+    "    scoring=\"__________\"\n",
+    ")\n",
+    "grid_rf.__________(__________, __________)\n",
+    "best_model_rf = grid_rf.__________\n",
+    "print(\"Best parameters:\", grid_rf.__________)\n",
+    "print(\"Best CV PR AUC (Random Forest):\", grid_rf.__________)\n",
+    "std = grid_rf.cv_results_[\"__________\"][grid_rf.__________]\n",
+    "print(std)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "820daccd_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "param_grid_rf= {\n",
+    "    'n_estimators': [10],\n",
+    "    'max_depth': [None, 10],\n",
+    "    'min_samples_split': [2, 5],\n",
+    "    'min_samples_leaf': [1, 2]\n",
+    "}\n",
+    "\n",
+    "grid_rf = GridSearchCV(\n",
+    "    RandomForestClassifier(random_state=42),\n",
+    "    param_grid_rf,\n",
+    "    cv=strat_kfolds,\n",
+    "    scoring=\"average_precision\"\n",
+    ")\n",
+    "grid_rf.fit(X_train, y_train)\n",
+    "best_model_rf = grid_rf.best_estimator_\n",
+    "print('Best parameters:', grid_rf.best_params_)\n",
+    "print('Best CV PR AUC (Random Forest):', grid_rf.best_score_)\n",
+    "std = grid_rf.cv_results_[\"std_test_score\"][grid_rf.best_index_]\n",
+    "print(std)\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "820daccd",
+   "metadata": {
+    "facilitator_solution": "param_grid_rf= {\n    'n_estimators': [10],\n    'max_depth': [None, 10],\n    'min_samples_split': [2, 5],\n    'min_samples_leaf': [1, 2]\n}\n\ngrid_rf = GridSearchCV(\n    RandomForestClassifier(random_state=42),\n    param_grid_rf,\n    cv=strat_kfolds,\n    scoring=\"average_precision\"\n)\ngrid_rf.fit(X_train, y_train)\nbest_model_rf = grid_rf.best_estimator_\nprint('Best parameters:', grid_rf.best_params_)\nprint('Best CV PR AUC (Random Forest):', grid_rf.best_score_)\nstd = grid_rf.cv_results_[\"std_test_score\"][grid_rf.best_index_]\nprint(std)",
+    "id": "820daccd",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "param_grid_rf= {\n",
+    "    'n_estimators': [10],\n",
+    "    'max_depth': [None, 10],\n",
+    "    'min_samples_split': [2, 5],\n",
+    "    'min_samples_leaf': [1, 2]\n",
+    "}\n",
+    "\n",
+    "grid_rf = GridSearchCV(\n",
+    "    RandomForestClassifier(random_state=42),\n",
+    "    param_grid_rf,\n",
+    "    cv=strat_kfolds,\n",
+    "    scoring=\"average_precision\"\n",
+    ")\n",
+    "grid_rf.fit(X_train, y_train)\n",
+    "best_model_rf = grid_rf.best_estimator_\n",
+    "print('Best parameters:', grid_rf.best_params_)\n",
+    "print('Best CV PR AUC (Random Forest):', grid_rf.best_score_)\n",
+    "std = grid_rf.cv_results_[\"std_test_score\"][grid_rf.best_index_]\n",
+    "print(std)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "513f0451",
+   "metadata": {
+    "id": "513f0451"
+   },
+   "source": [
+    "---\n",
+    "##  Model Evaluation For Classification\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ad3af4d2",
+   "metadata": {
+    "id": "ad3af4d2"
+   },
+   "source": [
+    "#### Motivation\n",
+    "* How do we know that are model has learned anything at all?\n",
+    "* A great way is to create a baseline model model that just makes random prediction and see how our model performs against that baseline."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a82644e6_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Baseline Dummy Classifier Evaluation</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# We use the dummy classifier as a baseline model to compare the performance of our other models.\n",
+    "dummy = DummyClassifier(\n",
+    "    strategy=\"__________\",\n",
+    "    random_state=__________\n",
+    ")\n",
+    "dummy.__________(__________, __________)\n",
+    "y_dummy_pred = dummy.__________(__________)\n",
+    "\n",
+    "print(\"Dummy Accuracy:\", __________(__________, __________))\n",
+    "print(\"Dummy Precision:\", __________(__________, __________, zero_division=__________))\n",
+    "print(\"Dummy Recall:\", __________(__________, __________, zero_division=__________))\n",
+    "\n",
+    "# Present the confusion matrix\n",
+    "fig, axes = plt.subplots(__________, __________, figsize=__________)\n",
+    "\n",
+    "ConfusionMatrixDisplay.from_predictions(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    ax=axes[__________],\n",
+    "    values_format=\"__________\"\n",
+    ")\n",
+    "axes[__________].set_title(\"__________\")\n",
+    "\n",
+    "# Normalised\n",
+    "ConfusionMatrixDisplay.from_predictions(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    normalize=\"__________\",\n",
+    "    ax=axes[__________],\n",
+    "    values_format=\"__________\"\n",
+    ")\n",
+    "axes[__________].set_title(\"__________\")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a82644e6_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "dummy = DummyClassifier(strategy=\"stratified\", random_state=42)\n",
+    "dummy.fit(X_train, y_train)\n",
+    "y_dummy_pred = dummy.predict(X_test)\n",
+    "\n",
+    "print(\"Dummy Accuracy:\", accuracy_score(y_test, y_dummy_pred))\n",
+    "print(\"Dummy Precision:\", precision_score(y_test, y_dummy_pred, zero_division=0))\n",
+    "print(\"Dummy Recall:\", recall_score(y_test, y_dummy_pred, zero_division=0))\n",
+    "\n",
+    "fig, axes = plt.subplots(1, 2, figsize=(12, 5))\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_dummy_pred, ax=axes[0], values_format=\"d\")\n",
+    "axes[0].set_title(\"Confusion Matrix (Counts)\")\n",
+    "\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_dummy_pred, normalize=\"true\", ax=axes[1], values_format=\".2f\")\n",
+    "axes[1].set_title(\"Confusion Matrix (Normalised)\")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a82644e6",
+   "metadata": {
+    "facilitator_solution": "dummy = DummyClassifier(strategy=\"stratified\", random_state=42)\ndummy.fit(X_train, y_train)\ny_dummy_pred = dummy.predict(X_test)\nprint(\"Dummy Accuracy:\", accuracy_score(y_test, y_dummy_pred))\nprint(\"Dummy Precision:\", precision_score(y_test, y_dummy_pred, zero_division=0))\nprint(\"Dummy Recall:\", recall_score(y_test, y_dummy_pred, zero_division=0))\nfig, axes = plt.subplots(1, 2, figsize=(12, 5))\nConfusionMatrixDisplay.from_predictions(y_test, y_dummy_pred, ax=axes[0], values_format=\"d\")\naxes[0].set_title(\"Confusion Matrix (Counts)\")\nConfusionMatrixDisplay.from_predictions(y_test, y_dummy_pred, normalize=\"true\", ax=axes[1], values_format=\".2f\")\naxes[1].set_title(\"Confusion Matrix (Normalised)\")",
+    "id": "a82644e6",
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "dummy = DummyClassifier(strategy=\"stratified\", random_state=42)\n",
+    "dummy.fit(X_train, y_train)\n",
+    "y_dummy_pred = dummy.predict(X_test)\n",
+    "print(\"Dummy Accuracy:\", accuracy_score(y_test, y_dummy_pred))\n",
+    "print(\"Dummy Precision:\", precision_score(y_test, y_dummy_pred, zero_division=0))\n",
+    "print(\"Dummy Recall:\", recall_score(y_test, y_dummy_pred, zero_division=0))\n",
+    "fig, axes = plt.subplots(1, 2, figsize=(12, 5))\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_dummy_pred, ax=axes[0], values_format=\"d\")\n",
+    "axes[0].set_title(\"Confusion Matrix (Counts)\")\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_dummy_pred, normalize=\"true\", ax=axes[1], values_format=\".2f\")\n",
+    "axes[1].set_title(\"Confusion Matrix (Normalised)\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2d674e60",
+   "metadata": {
+    "id": "2d674e60"
+   },
+   "source": [
+    "# Policy Interpretation\n",
+    "\n",
+    "Random guessing results show that:\n",
+    "\n",
+    "when the model predicts a resident will leave, it is correct only about 17% of the time (precision ~17%).\n",
+    "\n",
+    "Only ~17% of true leavers would be identified.\n",
+    "\n",
+    "Most funding would be misdirected.\n",
+    "\n",
+    "This is not a viable policy tool."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3e3cebf9",
+   "metadata": {
+    "id": "3e3cebf9"
+   },
+   "source": [
+    "---\n",
+    "# Evaluating The Best Model\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "585daa46",
+   "metadata": {
+    "id": "585daa46"
+   },
+   "source": [
+    "we import the best model from the previous section"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9015d360_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Evaluate Best Model on Test Set</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "best_model = __________\n",
+    "y_pred = best_model.__________(__________)\n",
+    "\n",
+    "fig, axes = plt.subplots(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    figsize=__________\n",
+    ")\n",
+    "\n",
+    "# Raw counts\n",
+    "ConfusionMatrixDisplay.from_predictions(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    ax=axes[__________],\n",
+    "    values_format=\"__________\"\n",
+    ")\n",
+    "axes[__________].set_title(\"__________\")\n",
+    "\n",
+    "# Normalised\n",
+    "ConfusionMatrixDisplay.from_predictions(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    normalize=\"__________\",\n",
+    "    ax=axes[__________],\n",
+    "    values_format=\"__________\"\n",
+    ")\n",
+    "axes[__________].set_title(\"__________\")\n",
+    "\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "\n",
+    "print(\"Precision:\", __________(__________, __________))\n",
+    "print(\"Recall:\", __________(__________, __________))\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9015d360_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "best_model = best_model_rf\n",
+    "y_pred = best_model.predict(X_test)\n",
+    "\n",
+    "fig, axes = plt.subplots(1, 2, figsize=(12, 5))\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_pred, ax=axes[0], values_format=\"d\")\n",
+    "axes[0].set_title(\"Confusion Matrix (Counts)\")\n",
+    "\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_pred, normalize=\"true\", ax=axes[1], values_format=\".2f\")\n",
+    "axes[1].set_title(\"Confusion Matrix (Normalised)\")\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "\n",
+    "print('Precision:', precision_score(y_test, y_pred))\n",
+    "print('Recall:', recall_score(y_test, y_pred))\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9015d360",
+   "metadata": {
+    "facilitator_solution": "best_model = best_model_rf\ny_pred = best_model.predict(X_test)\nfig, axes = plt.subplots(1, 2, figsize=(12, 5))\nConfusionMatrixDisplay.from_predictions(y_test, y_pred, ax=axes[0], values_format=\"d\")\naxes[0].set_title(\"Confusion Matrix (Counts)\")\nConfusionMatrixDisplay.from_predictions(y_test, y_pred, normalize=\"true\", ax=axes[1], values_format=\".2f\")\naxes[1].set_title(\"Confusion Matrix (Normalised)\")\nplt.tight_layout()\nplt.show()\nprint('Precision:', precision_score(y_test, y_pred))\nprint('Recall:', recall_score(y_test, y_pred))",
+    "id": "9015d360",
+    "jupyter": {
+     "source_hidden": true
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "best_model = best_model_rf\n",
+    "y_pred = best_model.predict(X_test)\n",
+    "fig, axes = plt.subplots(1, 2, figsize=(12, 5))\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_pred, ax=axes[0], values_format=\"d\")\n",
+    "axes[0].set_title(\"Confusion Matrix (Counts)\")\n",
+    "ConfusionMatrixDisplay.from_predictions(y_test, y_pred, normalize=\"true\", ax=axes[1], values_format=\".2f\")\n",
+    "axes[1].set_title(\"Confusion Matrix (Normalised)\")\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "print('Precision:', precision_score(y_test, y_pred))\n",
+    "print('Recall:', recall_score(y_test, y_pred))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9283c704",
+   "metadata": {
+    "id": "9283c704"
+   },
+   "source": [
+    "#### Discuss\n",
+    "\n",
+    "* Compare the performance of random forest model versus the baseline\n",
+    "* What does it tell us?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d2b7afaa",
+   "metadata": {
+    "id": "d2b7afaa",
+    "jp-MarkdownHeadingCollapsed": true
+   },
+   "source": [
+    "\n",
+    "## Precision\n",
+    "\n",
+    "* When the model predicts that someone is at risk of leaving, it is correct about 96% of the time.\n",
+    "\n",
+    "* So the misallocation of financial resources is very low.\n",
+    "\n",
+    "#### Policy framing\n",
+    "\n",
+    "* The model results in very little wasted intervention spending.\n",
+    "\n",
+    "## Recall\n",
+    "\n",
+    "* The model correctly identifies about 63% of the individuals who actually leave.\n",
+    "\n",
+    "#### policy framing\n",
+    "\n",
+    "* The model captures most at-risk individuals but does not detect all of them.\n",
+    "* The remaining 37% missed may still leave without intervention.\n",
+    "\n",
+    "#### Trade-off\n",
+    "\n",
+    "* The model prioritises accuracy of intervention over identifying every possible leaver.\n",
+    "* The model is very good at targeting interventions to those who are truly at risk, but it does not capture every single case.\n",
+    "* This is a common and acceptable trade-off in many real-world applications, especially when resources are limited and the cost of false positives is high.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c1f8ae89",
+   "metadata": {
+    "id": "c1f8ae89"
+   },
+   "source": [
+    "## Train a classification model with low-code approach"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9fbf90e4",
+   "metadata": {
+    "id": "9fbf90e4"
+   },
+   "source": [
+    "Now that you are comfortable with what classification models are. Similar to regression, we can also use `pycaret` to help us build a classification model quickly\n",
+    "\n",
+    "\n",
+    "### The Game Plan\n",
+    "\n",
+    "Here is how we are going to tackle this notebook:\n",
+    "\n",
+    "* **Step 1:** Feed our dataset to PyCaret and let it handle the background setup.\n",
+    "* **Step 2:** Tell PyCaret to compare every major classification model available to find our top performer.\n",
+    "* **Step 3:** Crown the winning model and use it to make real-world predictions.\n",
+    "\n",
+    "Scroll down, hit the first code block, and let's get started."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "069ae3d2_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: PyCaret Low-Code Classification</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "# create a new dataframe for storing the data to be trained by pycaret\n",
+    "df_py = df.__________()\n",
+    "\n",
+    "# import the pycaret library to build the object\n",
+    "from pycaret.classification import __________\n",
+    "\n",
+    "# Store the training model\n",
+    "exp = ClassificationExperiment(\n",
+    "    target=\"__________\",\n",
+    "    session_id=__________,\n",
+    "    fold=__________,\n",
+    "    n_jobs=__________,\n",
+    "    train_size=__________\n",
+    ").fit(__________)\n",
+    "\n",
+    "result = exp.__________()\n",
+    "result.__________\n",
+    "\n",
+    "best_model = result.__________\n",
+    "best_model\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "069ae3d2_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "df_py = df.copy()\n",
+    "from pycaret.classification import ClassificationExperiment\n",
+    "\n",
+    "exp = ClassificationExperiment(\n",
+    "    target=\"residential_out_migration\",\n",
+    "    session_id=123,\n",
+    "    fold=5,\n",
+    "    n_jobs=1,\n",
+    "    train_size=0.8\n",
+    ").fit(df_py)\n",
+    "\n",
+    "result = exp.compare_models()\n",
+    "result.leaderboard\n",
+    "\n",
+    "best_model = result.best\n",
+    "best_model\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "069ae3d2",
+   "metadata": {
+    "facilitator_solution": "df_py = df.copy()\nfrom pycaret.classification import ClassificationExperiment\nexp = ClassificationExperiment(target=\"residential_out_migration\", session_id=123, fold=5, n_jobs=1, train_size=0.8).fit(df_py)\nresult = exp.compare_models()\nresult.leaderboard\nbest_model = result.best\nbest_model",
+    "id": "069ae3d2",
+    "jupyter": {
+     "source_hidden": true
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "df_py = df.copy()\n",
+    "from pycaret.classification import ClassificationExperiment\n",
+    "exp = ClassificationExperiment(target=\"residential_out_migration\", session_id=123, fold=5, n_jobs=1, train_size=0.8).fit(df_py)\n",
+    "result = exp.compare_models()\n",
+    "result.leaderboard\n",
+    "best_model = result.best\n",
+    "best_model"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "49771a8c",
+   "metadata": {
+    "id": "49771a8c"
+   },
+   "source": [
+    "#### Which one is our best model?\n",
+    "\n",
+    "Ask yourself:\n",
+    "\n",
+    "- Which model performed best?\n",
+    "- Which metric is PyCaret sorting by?\n",
+    "- Is that the right metric for this problem?\n",
+    "- What would the business consequence of a false positive or false negative be?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8d13c8c0",
+   "metadata": {
+    "id": "8d13c8c0"
+   },
+   "source": [
+    "---\n",
+    "## Optional stretch:\n",
+    "\n",
+    "### further consideration: Adding uncertainty estimates to our predictions\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bf56669f",
+   "metadata": {
+    "id": "bf56669f"
+   },
+   "source": [
+    "As we mentioned in the Regression notebook, using a single value (point estimate) to evaluate model performance can be misleading. we use bootstrapping to measure the uncertainty in precision scores to get a better understanding of the model performance in the case the test set is slightly different than the one we have."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7574d150_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Bootstrap Uncertainty Estimates</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "rng = np.random.default_rng(__________)\n",
+    "\n",
+    "n_boot = __________\n",
+    "n = __________\n",
+    "\n",
+    "boot_precisions = np.empty(__________)\n",
+    "\n",
+    "# convert to numpy arrays to allow fancy indexing reliably\n",
+    "y_true = np.asarray(__________)\n",
+    "y_hat = np.asarray(__________)\n",
+    "\n",
+    "for b in range(__________):\n",
+    "    idx = rng.integers(\n",
+    "        __________,\n",
+    "        __________,\n",
+    "        size=__________\n",
+    "    )  # sample indices with replacement\n",
+    "\n",
+    "    boot_precisions[b] = precision_score(\n",
+    "        y_true[__________],\n",
+    "        y_hat[__________],\n",
+    "        zero_division=__________\n",
+    "    )\n",
+    "\n",
+    "ci_low, ci_high = np.percentile(\n",
+    "    __________,\n",
+    "    __________\n",
+    ")\n",
+    "\n",
+    "print(\n",
+    "    f\"Precision (bootstrap 95% CI): \"\n",
+    "    f\"[{ci_low:.4f}, {ci_high:.4f}]\"\n",
+    ")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7574d150_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "rng = np.random.default_rng(42)\n",
+    "\n",
+    "n_boot = 5000\n",
+    "n = len(y_test)\n",
+    "\n",
+    "boot_precisions = np.empty(n_boot)\n",
+    "\n",
+    "y_true = np.asarray(y_test)\n",
+    "y_hat = np.asarray(y_pred)\n",
+    "\n",
+    "for b in range(n_boot):\n",
+    "    idx = rng.integers(0, n, size=n)\n",
+    "    boot_precisions[b] = precision_score(y_true[idx], y_hat[idx], zero_division=0)\n",
+    "\n",
+    "ci_low, ci_high = np.percentile(boot_precisions, [2.5, 97.5])\n",
+    "\n",
+    "print(f\"Precision (bootstrap 95% CI): [{ci_low:.4f}, {ci_high:.4f}]\")\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7574d150",
+   "metadata": {
+    "facilitator_solution": "rng = np.random.default_rng(42)\n\nn_boot = 5000\nn = len(y_test)\n\nboot_precisions = np.empty(n_boot)\n\n# convert to numpy arrays to allow fancy indexing reliably\ny_true = np.asarray(y_test)\ny_hat = np.asarray(y_pred)\n\nfor b in range(n_boot):\n    idx = rng.integers(0, n, size=n)  # sample indices with replacement\n    boot_precisions[b] = precision_score(y_true[idx], y_hat[idx], zero_division=0)\n\nci_low, ci_high = np.percentile(boot_precisions, [2.5, 97.5])\n\nprint(f\"Precision (bootstrap 95% CI): [{ci_low:.4f}, {ci_high:.4f}]\")",
+    "id": "7574d150",
+    "jupyter": {
+     "source_hidden": true
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "rng = np.random.default_rng(42)\n",
+    "n_boot = 5000\n",
+    "n = len(y_test)\n",
+    "boot_precisions = np.empty(n_boot)\n",
+    "y_true = np.asarray(y_test)\n",
+    "y_hat = np.asarray(y_pred)\n",
+    "for b in range(n_boot):\n",
+    "    idx = rng.integers(0, n, size=n)\n",
+    "    boot_precisions[b] = precision_score(y_true[idx], y_hat[idx], zero_division=0)\n",
+    "ci_low, ci_high = np.percentile(boot_precisions, [2.5, 97.5])\n",
+    "print(f\"Precision (bootstrap 95% CI): [{ci_low:.4f}, {ci_high:.4f}]\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7f76e3dc",
+   "metadata": {
+    "id": "7f76e3dc"
+   },
+   "source": [
+    "In simple terms, this means:\n",
+    "\n",
+    "If we tested the model on another similar dataset, the precision might change a little.\n",
+    "The confidence interval shows how much it could realistically change.\n",
+    "\n",
+    "So instead of saying:\n",
+    "The model is correct exactly 96% of the time,\n",
+    "\n",
+    "Our test set is just one sample of data.\n",
+    "\n",
+    "If you collected another similar dataset:\n",
+    "- Precision might be 93%\n",
+    "- or 96%\n",
+    "- or 98%\n",
+    "\n",
+    "The interval shows the likely range.\n",
+    "\n",
+    "we say:\n",
+    "It is probably between 93% and 98% correct, depending on the sample we happened to test it on.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "937305f1",
+   "metadata": {
+    "id": "937305f1"
+   },
+   "source": [
+    "---\n",
+    "### Optional stretch: further considerations - thresholding\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b89bf4ec",
+   "metadata": {
+    "id": "b89bf4ec"
+   },
+   "source": [
+    "At a threshold of 0.5 default threshold. the model achieves precision of 0.96, meaning only 4% of funded interventions would be misallocated. This reflects strong fiscal discipline. Lets us look at at an example of how we can improve of test accuracy by tuning the threshold"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "43307004",
+   "metadata": {
+    "id": "43307004"
+   },
+   "source": [
+    "#### Compute precision recall curve function\n",
+    "\n",
+    "* We then use the precision_recall_curve function to compute the precision-recall pairs for different probability thresholds.\n",
+    "* This function returns three arrays: precisions, recalls, and thresholds.\n",
+    "* The precisions and recalls arrays contain the precision and recall values for each threshold, while the thresholds array contains the corresponding probability thresholds.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e12202e5_practice",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>✏️ Practice: Threshold Tuning & Decision Boundary Analysis</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python_practice\n",
+    "from sklearn.model_selection import cross_val_predict\n",
+    "\n",
+    "y_probas_forest = cross_val_predict(\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    __________,\n",
+    "    cv=__________,\n",
+    "    method=\"__________\"\n",
+    ")\n",
+    "y_scores_forest = y_probas_forest[:, __________]\n",
+    "\n",
+    "precisions, recalls, thresholds = precision_recall_curve(\n",
+    "    __________,\n",
+    "    __________\n",
+    ")\n",
+    "\n",
+    "plt.plot(thresholds, precisions[:-1], label=\"__________\")\n",
+    "plt.plot(thresholds, recalls[:-1], label=\"__________\")\n",
+    "plt.xlabel(\"__________\")\n",
+    "plt.ylabel(\"__________\")\n",
+    "plt.legend()\n",
+    "plt.show()\n",
+    "\n",
+    "target_precision = __________\n",
+    "valid = __________ >= __________\n",
+    "best_idx = np.argmax(__________[__________])\n",
+    "\n",
+    "chosen_threshold = __________[__________][__________]\n",
+    "chosen_precision = __________[__________][__________]\n",
+    "chosen_recall = __________[__________][__________]\n",
+    "\n",
+    "print(\"Chosen threshold:\", __________)\n",
+    "print(\"Precision at threshold:\", __________)\n",
+    "print(\"Recall at threshold:\", __________)\n",
+    "\n",
+    "y_train_pred_custom = (__________ >= __________).astype(__________)\n",
+    "y_test_scores = __________.predict_proba(__________)[:, __________]\n",
+    "y_test_pred_custom = (__________ >= __________).astype(__________)\n",
+    "\n",
+    "print(\"Test precision:\", __________(__________, __________))\n",
+    "print(\"Test recall:\", __________(__________, __________))\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e12202e5_sol",
+   "metadata": {},
+   "source": [
+    "<details>\n",
+    "<summary><b>💡 Click to Reveal Solution</b></summary>\n",
+    "<br>\n",
+    "\n",
+    "```python\n",
+    "from sklearn.model_selection import cross_val_predict\n",
+    "\n",
+    "y_probas_forest = cross_val_predict(best_model, X_train, y_train, cv=strat_kfolds, method=\"predict_proba\")\n",
+    "y_scores_forest = y_probas_forest[:, 1]\n",
+    "\n",
+    "precisions, recalls, thresholds = precision_recall_curve(y_train, y_scores_forest)\n",
+    "\n",
+    "plt.plot(thresholds, precisions[:-1], label=\"Precision\")\n",
+    "plt.plot(thresholds, recalls[:-1], label=\"Recall\")\n",
+    "plt.xlabel(\"Threshold\")\n",
+    "plt.ylabel(\"Metric\")\n",
+    "plt.legend()\n",
+    "plt.show()\n",
+    "\n",
+    "target_precision = 0.975\n",
+    "valid = precisions[:-1] >= target_precision\n",
+    "best_idx = np.argmax(recalls[:-1][valid])\n",
+    "\n",
+    "chosen_threshold = thresholds[valid][best_idx]\n",
+    "chosen_precision = precisions[:-1][valid][best_idx]\n",
+    "chosen_recall = recalls[:-1][valid][best_idx]\n",
+    "\n",
+    "print(\"Chosen threshold:\", chosen_threshold)\n",
+    "print(\"Precision at threshold:\", chosen_precision)\n",
+    "print(\"Recall at threshold:\", chosen_recall)\n",
+    "\n",
+    "y_train_pred_custom = (y_scores_forest >= chosen_threshold).astype(int)\n",
+    "y_test_scores = best_model.predict_proba(X_test)[:, 1]\n",
+    "y_test_pred_custom = (y_test_scores >= chosen_threshold).astype(int)\n",
+    "\n",
+    "print(\"Test precision:\", precision_score(y_test, y_test_pred_custom))\n",
+    "print(\"Test recall:\", recall_score(y_test, y_test_pred_custom))\n",
+    "```\n",
+    "\n",
+    "</details>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e12202e5",
+   "metadata": {
+    "facilitator_solution": "from sklearn.model_selection import cross_val_predict\ny_probas_forest = cross_val_predict(best_model, X_train, y_train, cv=strat_kfolds, method=\"predict_proba\")\ny_scores_forest = y_probas_forest[:, 1]\nprecisions, recalls, thresholds = precision_recall_curve(y_train, y_scores_forest)\nplt.plot(thresholds, precisions[:-1], label=\"Precision\")\nplt.plot(thresholds, recalls[:-1], label=\"Recall\")\nplt.xlabel(\"Threshold\")\nplt.ylabel(\"Metric\")\nplt.legend()\nplt.show()\ntarget_precision = 0.975\nvalid = precisions[:-1] >= target_precision\nbest_idx = np.argmax(recalls[:-1][valid])\nchosen_threshold = thresholds[valid][best_idx]\nchosen_precision = precisions[:-1][valid][best_idx]\nchosen_recall = recalls[:-1][valid][best_idx]\nprint(\"Chosen threshold:\", chosen_threshold)\nprint(\"Precision at threshold:\", chosen_precision)\nprint(\"Recall at threshold:\", chosen_recall)\ny_train_pred_custom = (y_scores_forest >= chosen_threshold).astype(int)\ny_test_scores = best_model.predict_proba(X_test)[:, 1]\ny_test_pred_custom = (y_test_scores >= chosen_threshold).astype(int)\nprint(\"Test precision:\", precision_score(y_test, y_test_pred_custom))\nprint(\"Test recall:\", recall_score(y_test, y_test_pred_custom))",
+    "id": "e12202e5",
+    "jupyter": {
+     "source_hidden": true
+    },
+    "tags": [
+     "learner-code-along"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import cross_val_predict\n",
+    "y_probas_forest = cross_val_predict(best_model, X_train, y_train, cv=strat_kfolds, method=\"predict_proba\")\n",
+    "y_scores_forest = y_probas_forest[:, 1]\n",
+    "precisions, recalls, thresholds = precision_recall_curve(y_train, y_scores_forest)\n",
+    "plt.plot(thresholds, precisions[:-1], label=\"Precision\")\n",
+    "plt.plot(thresholds, recalls[:-1], label=\"Recall\")\n",
+    "plt.xlabel(\"Threshold\")\n",
+    "plt.ylabel(\"Metric\")\n",
+    "plt.legend()\n",
+    "plt.show()\n",
+    "target_precision = 0.975\n",
+    "valid = precisions[:-1] >= target_precision\n",
+    "best_idx = np.argmax(recalls[:-1][valid])\n",
+    "chosen_threshold = thresholds[valid][best_idx]\n",
+    "chosen_precision = precisions[:-1][valid][best_idx]\n",
+    "chosen_recall = recalls[:-1][valid][best_idx]\n",
+    "print(\"Chosen threshold:\", chosen_threshold)\n",
+    "print(\"Precision at threshold:\", chosen_precision)\n",
+    "print(\"Recall at threshold:\", chosen_recall)\n",
+    "y_train_pred_custom = (y_scores_forest >= chosen_threshold).astype(int)\n",
+    "y_test_scores = best_model.predict_proba(X_test)[:, 1]\n",
+    "y_test_pred_custom = (y_test_scores >= chosen_threshold).astype(int)\n",
+    "print(\"Test precision:\", precision_score(y_test, y_test_pred_custom))\n",
+    "print(\"Test recall:\", recall_score(y_test, y_test_pred_custom))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5bd3e1b4",
+   "metadata": {
+    "id": "5bd3e1b4"
+   },
+   "source": [
+    "### Additional resources\n",
+    "\n",
+    "* A ultimate guide to hyperparameter tuning | grid search vs. randomised search\n",
+    "[https://www.youtube.com/watch?v=DTcfH5W6o08] (8 minutes)\n",
+    "* Machine learning: Hyperparameter tuning (GridsearchCV)\n",
+    "[https://www.youtube.com/watch?v=HdlDYng8g9s&t=284s] (11 minutes)\n",
+    "* [MLU explain: Logistic regression](https://mlu-explain.github.io/logistic-regression/)\n",
+    "* [StatQuest video on Logistic Regression (up to 5:15)](https://www.youtube.com/watch?v=yIYKR4sgzI8) (5min watch)\n",
+    "* [4 Logistic Regressions Examples to Help You Understand](https://magoosh.com/data-science/4-logistic-regressions-examples/) (2min read)\n",
+    "* [StatQuest video on Logistic Regression (from 6:10 to 8:08)](https://www.youtube.com/watch?v=yIYKR4sgzI8) (2 min)"
+   ]
+  }
+ ],
+ "metadata": {
+  "code_along_version": {
+   "approach": "Guided learner code-along",
+   "facilitator_solutions_stored_in_code_cell_metadata": true,
+   "markdown_preserved": true,
+   "placeholder": "FILL_IN",
+   "source_notebook": "M6.2_RnC_learner_completed(1).ipynb"
+  },
+  "colab": {
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

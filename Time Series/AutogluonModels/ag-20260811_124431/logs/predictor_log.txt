@@ -1,0 +1,81 @@
+Beginning AutoGluon training... Time limit = 120s
+AutoGluon will save models to '/Users/james.lam/Workshops/Data Science Accelerator/Time Series/AutogluonModels/ag-20260811_124431'
+=================== System Info ===================
+AutoGluon Version:  1.5.0
+Python Version:     3.11.15
+Operating System:   Darwin
+Platform Machine:   arm64
+Platform Version:   Darwin Kernel Version 24.6.0: Tue Jul 21 20:50:11 PDT 2026; root:xnu-11417.140.69.711.44~1/RELEASE_ARM64_T6041
+CPU Count:          12
+Pytorch Version:    2.9.1
+CUDA Version:       CUDA is not available
+GPU Count:          WARNING: Exception was raised when calculating GPU count (AssertionError)
+Memory Avail:       4.22 GB / 24.00 GB (17.6%)
+Disk Space Avail:   248.15 GB / 460.43 GB (53.9%)
+===================================================
+Setting presets to: fast_training
+
+Fitting with arguments:
+{'enable_ensemble': True,
+ 'eval_metric': RMSE,
+ 'hyperparameters': 'very_light',
+ 'known_covariates_names': [],
+ 'num_val_windows': 1,
+ 'prediction_length': 94,
+ 'quantile_levels': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+ 'random_seed': 123,
+ 'refit_every_n_windows': 1,
+ 'refit_full': False,
+ 'skip_model_selection': False,
+ 'target': 'unemployment_claim',
+ 'time_limit': 120,
+ 'verbosity': 2}
+
+Inferred time series frequency: 'W-SUN'
+Provided train_data has 376 rows, 1 time series. Median time series length is 376 (min=376, max=376). 
+
+Provided data contains following columns:
+	target: 'unemployment_claim'
+
+AutoGluon will gauge predictive performance using evaluation metric: 'RMSE'
+	This metric's sign has been flipped to adhere to being higher_is_better. The metric score can be multiplied by -1 to get the metric value.
+===================================================
+
+Starting training. Start time is 2026-08-11 13:44:32
+Models that will be trained: ['Naive', 'SeasonalNaive', 'RecursiveTabular', 'DirectTabular', 'ETS', 'Theta']
+Training timeseries model Naive. Training for up to 17.0s of the 118.8s of remaining time.
+	-2469.0601    = Validation score (-RMSE)
+	0.00    s     = Training runtime
+	1.40    s     = Validation (prediction) runtime
+Training timeseries model SeasonalNaive. Training for up to 19.6s of the 117.3s of remaining time.
+	-2469.0601    = Validation score (-RMSE)
+	0.00    s     = Training runtime
+	0.93    s     = Validation (prediction) runtime
+Training timeseries model RecursiveTabular. Training for up to 23.3s of the 116.4s of remaining time.
+	-11254.9793   = Validation score (-RMSE)
+	0.54    s     = Training runtime
+	0.08    s     = Validation (prediction) runtime
+Training timeseries model DirectTabular. Training for up to 28.9s of the 115.8s of remaining time.
+	-10353.4430   = Validation score (-RMSE)
+	0.55    s     = Training runtime
+	0.01    s     = Validation (prediction) runtime
+Training timeseries model ETS. Training for up to 38.4s of the 115.2s of remaining time.
+	-2794.6610    = Validation score (-RMSE)
+	0.00    s     = Training runtime
+	1.47    s     = Validation (prediction) runtime
+Training timeseries model Theta. Training for up to 56.9s of the 113.7s of remaining time.
+	-1976.8095    = Validation score (-RMSE)
+	0.00    s     = Training runtime
+	0.40    s     = Validation (prediction) runtime
+Fitting 1 ensemble(s), in 1 layers.
+Training ensemble model WeightedEnsemble. Training for up to 113.3s.
+	Ensemble weights: {'DirectTabular': 0.02, 'ETS': 0.27, 'RecursiveTabular': 0.11, 'Theta': 0.6}
+	-1806.7161    = Validation score (-RMSE)
+	0.05    s     = Training runtime
+	1.97    s     = Validation (prediction) runtime
+Training complete. Models trained: ['Naive', 'SeasonalNaive', 'RecursiveTabular', 'DirectTabular', 'ETS', 'Theta', 'WeightedEnsemble']
+Total runtime: 5.93 s
+Best model: WeightedEnsemble
+Best model score: -1806.7161
+Additional data provided, testing on additional data. Resulting leaderboard will be sorted according to test score (`score_test`).
+Model not specified in predict, will default to the model with the best validation score: WeightedEnsemble

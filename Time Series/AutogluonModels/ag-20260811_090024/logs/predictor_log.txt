@@ -1,0 +1,77 @@
+Beginning AutoGluon training... Time limit = 60s
+AutoGluon will save models to '/Users/james.lam/Workshops/Data Science Accelerator/Time Series/AutogluonModels/ag-20260811_090024'
+=================== System Info ===================
+AutoGluon Version:  1.5.0
+Python Version:     3.11.15
+Operating System:   Darwin
+Platform Machine:   arm64
+Platform Version:   Darwin Kernel Version 24.6.0: Tue Jul 21 20:50:11 PDT 2026; root:xnu-11417.140.69.711.44~1/RELEASE_ARM64_T6041
+CPU Count:          12
+Pytorch Version:    2.9.1
+CUDA Version:       CUDA is not available
+GPU Count:          WARNING: Exception was raised when calculating GPU count (AssertionError)
+Memory Avail:       4.86 GB / 24.00 GB (20.3%)
+Disk Space Avail:   250.70 GB / 460.43 GB (54.4%)
+===================================================
+
+Fitting with arguments:
+{'enable_ensemble': True,
+ 'eval_metric': MASE,
+ 'hyperparameters': 'default',
+ 'known_covariates_names': [],
+ 'num_val_windows': 1,
+ 'prediction_length': 12,
+ 'quantile_levels': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+ 'random_seed': 123,
+ 'refit_every_n_windows': 1,
+ 'refit_full': False,
+ 'skip_model_selection': False,
+ 'target': 'temperature',
+ 'time_limit': 60,
+ 'verbosity': 2}
+
+Inferred time series frequency: 'ns'
+Provided train_data has 4968 rows, 1 time series. Median time series length is 4968 (min=4968, max=4968). 
+
+Provided data contains following columns:
+	target: 'temperature'
+	past_covariates:
+		categorical:        []
+		continuous (float): []
+
+AutoGluon will ignore following non-numeric/non-informative columns:
+	ignored covariates:      ['date']
+
+To learn how to fix incorrectly inferred types, please see documentation for TimeSeriesPredictor.fit
+
+AutoGluon will gauge predictive performance using evaluation metric: 'MASE'
+	This metric's sign has been flipped to adhere to being higher_is_better. The metric score can be multiplied by -1 to get the metric value.
+===================================================
+
+Starting training. Start time is 2026-08-11 10:00:26
+Models that will be trained: ['SeasonalNaive', 'RecursiveTabular', 'DirectTabular', 'DynamicOptimizedTheta', 'Chronos2', 'Chronos2SmallFineTuned', 'AutoETS', 'ChronosWithRegressor[bolt_small]', 'TemporalFusionTransformer', 'DeepAR']
+Training timeseries model SeasonalNaive. Training for up to 5.1s of the 55.9s of remaining time.
+	-1.1225       = Validation score (-MASE)
+	0.01    s     = Training runtime
+	1.40    s     = Validation (prediction) runtime
+Training timeseries model RecursiveTabular. Training for up to 5.5s of the 54.5s of remaining time.
+	-0.7480       = Validation score (-MASE)
+	3.15    s     = Training runtime
+	0.02    s     = Validation (prediction) runtime
+Training timeseries model DirectTabular. Training for up to 5.7s of the 51.3s of remaining time.
+	-0.7099       = Validation score (-MASE)
+	1.87    s     = Training runtime
+	0.02    s     = Validation (prediction) runtime
+Training timeseries model DynamicOptimizedTheta. Training for up to 6.2s of the 49.4s of remaining time.
+	Time limit exceeded... Skipping DynamicOptimizedTheta.
+Training timeseries model Chronos2. Training for up to 7.1s of the 49.4s of remaining time.
+	Time limit exceeded... Skipping Chronos2.
+Stopping training due to lack of time remaining. Time left: -88.0 seconds
+Not fitting ensemble due to lack of time remaining. Time left: -88.0 seconds
+Training complete. Models trained: ['SeasonalNaive', 'RecursiveTabular', 'DirectTabular']
+Total runtime: 145.73 s
+Best model: DirectTabular
+Best model score: -0.7099
+Model not specified in predict, will default to the model with the best validation score: DirectTabular
+Model not specified in predict, will default to the model with the best validation score: DirectTabular
+Model not specified in predict, will default to the model with the best validation score: DirectTabular

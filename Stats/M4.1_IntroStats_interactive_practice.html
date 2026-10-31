@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statistics for Machine Learning — Interactive Practice</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+  <style>
+    :root {
+    --ink: #152033;
+    --muted: #5d6878;
+    --line: #d9e0e8;
+
+    --blue: #1769e0;
+    --blue-soft: #edf5ff;
+
+    --green: #138a5b;
+    --green-soft: #eaf8f2;
+
+    --orange: #b65713;
+    --orange-soft: #fff5e9;
+
+    --navy: #102a43;
+    --paper: #ffffff;
+    --canvas: #f3f6fa;
+}
+    *{box-sizing:border-box} body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    header{background:linear-gradient(125deg,#0e2842,#175ea8);color:#fff;padding:28px clamp(18px,4vw,56px)}
+    .brand{font-size:.78rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;opacity:.82}.hero{max-width:1180px;margin:auto}.hero h1{font-size:clamp(1.8rem,4vw,3.1rem);line-height:1.08;margin:10px 0}.hero p{max-width:760px;margin:0;color:#dcecff}
+    main{max-width:1180px;margin:24px auto 48px;padding:0 18px}.status{display:flex;gap:10px;align-items:center;border:1px solid #bfd3ea;background:#f4f9ff;border-radius:12px;padding:12px 15px;margin-bottom:18px}.dot{width:11px;height:11px;border-radius:50%;background:#e39b2d;box-shadow:0 0 0 4px #f9e8c8}.status.ready .dot{background:var(--green);box-shadow:0 0 0 4px #cceee0}.status.error{background:#fff1f1;border-color:#efb7b7}.status.error .dot{background:#c73535;box-shadow:0 0 0 4px #f6d5d5}
+    .preview-card,.nav-card,.activity-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(33,53,76,.06)}.preview-card{padding:18px;margin-bottom:20px}.preview-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.preview-head h2{margin:0;font-size:1.1rem}.preview-head p{margin:4px 0 0;color:var(--muted);font-size:.92rem}.scenario-tag{white-space:nowrap;border-radius:999px;background:#e8f2ff;color:#1256a4;padding:5px 10px;font-weight:750;font-size:.78rem}.tables{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:14px;overflow:auto}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}.table-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted);margin:0 0 6px}.dataframe{width:100%;border-collapse:collapse;font-size:.8rem}.dataframe th,.dataframe td{padding:7px 9px;border-bottom:1px solid #e8edf2;text-align:left;white-space:nowrap}.dataframe th{background:#f7f9fc;color:#3c4a5e}.workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}.nav-card{padding:16px;position:sticky;top:16px}.nav-title{display:flex;justify-content:space-between;align-items:center}.nav-title h2{font-size:1rem;margin:0}.progress-track{height:9px;background:#e7ebf0;border-radius:99px;overflow:hidden;margin:12px 0 16px}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#1769e0,#18a47a);transition:width .25s}.theme-nav{margin:13px 0 5px}.theme-nav-head{display:flex;justify-content:space-between;gap:8px;font-size:.83rem;font-weight:800;color:#33425a}.theme-count{font-size:.72rem;color:var(--muted)}.step-nav{padding:7px 9px;margin-top:5px;border-left:3px solid #d5dce5;border-radius:5px;color:#778294;font-size:.78rem}.step-nav.current{background:var(--blue-soft);border-color:var(--blue);color:#174e96;font-weight:750}.step-nav.done{background:var(--green-soft);border-color:var(--green);color:#126443}.activity-card{overflow:hidden}.theme-banner{background:linear-gradient(100deg,#edf5ff,#f7fbff);border-bottom:1px solid #cfe0f4;padding:18px 22px}.theme-kicker{color:#1559a5;font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em}.theme-banner h2{margin:3px 0;font-size:1.25rem}.theme-banner p{margin:0;color:#52647b;font-size:.92rem}.step-body{padding:23px}.step-number{font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:850}.step-body h3{font-size:1.45rem;margin:3px 0 8px}.instruction{color:#334158;margin-bottom:16px}.hint{border-left:4px solid #d68524;background:var(--orange-soft);padding:11px 13px;border-radius:7px;margin-bottom:14px;color:#75400f}.hint strong{display:block;color:#8a460a;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}textarea{width:100%;min-height:155px;resize:vertical;border:1px solid #aeb9c7;border-radius:9px;padding:13px;background:#101826;color:#e9f1fb;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:4}textarea:focus{outline:3px solid #cfe4ff;border-color:#2c72cf}textarea:disabled{opacity:.78}.buttons{display:flex;gap:9px;margin:12px 0}.button{appearance:none;border:0;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer}.button:disabled{cursor:not-allowed;opacity:.45}.run{background:var(--green);color:#fff}.next{background:var(--blue);color:#fff}.output-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:#586579;margin:14px 0 6px}.output{min-height:66px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:11px;white-space:pre-wrap;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto}.feedback{display:none;margin-top:10px;padding:10px 12px;border-radius:7px}.feedback.success{display:block;background:var(--green-soft);border-left:4px solid var(--green);color:#126443}.feedback.warn{display:block;background:var(--orange-soft);border-left:4px solid #d37a17;color:#7a420f}.feedback.fail{display:block;background:#fff0f0;border-left:4px solid #d14242;color:#8f2323}.plots img{max-width:100%;margin-top:12px;border:1px solid var(--line);border-radius:8px;background:#fff}.completion{padding:34px;text-align:center}.completion .tick{font-size:3rem}.completion h2{margin:5px 0}.completion p{max-width:650px;margin:8px auto 20px;color:var(--muted)}.footer-note{text-align:center;color:#718096;font-size:.75rem;margin-top:22px}@media(max-width:900px){.workspace{grid-template-columns:1fr}.nav-card{position:static}.tables{grid-template-columns:1fr}}@media(max-width:600px){.scenario-tag{display:none}.step-body{padding:18px}.buttons{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <header><div class="hero"><div class="brand">Decoded · Learner Practice</div><h1>Statistics for machine learning</h1><p>Apply probability, descriptive statistics, hypothesis testing and subgroup reasoning to a new community-health scenario.</p></div></header>
+  <main>
+    <div id="runtimeStatus" class="status"><span class="dot"></span><span id="runtimeText">Starting Python…</span></div>
+    <section class="preview-card">
+      <div class="preview-head"><div><h2>Practice dataset preview</h2><p>Each row is a community clinic. A small regional lookup is provided for the first theme.</p></div><span class="scenario-tag">240 clinics · fixed seed</span></div>
+      <div id="datasetPreview" class="tables"><span>Loading the practice dataset…</span></div>
+    </section>
+    <div class="workspace">
+      <aside class="nav-card"><div class="nav-title"><h2>Activity progress</h2><strong id="overallCount">0/21</strong></div><div class="progress-track"><div id="progressFill" class="progress-fill"></div></div><div id="navigation"></div></aside>
+      <section id="activity" class="activity-card"></section>
+    </div>
+    <div class="footer-note">Runs locally in your browser using Pyodide. No external dataset is required.</div>
+  </main>
+  <script>
+  "use strict";
+  const themes = [
+    {id:1,title:"Prepare comparable clinic data",purpose:"Combine the lookup data and create rates that allow fair comparisons between clinics."},
+    {id:2,title:"Describe distributions and probabilities",purpose:"Move from raw values to centre, spread, probability and the shape of a distribution."},
+    {id:3,title:"Compare two group means",purpose:"Set up and run a Welch’s t-test without assuming the two groups have equal variance."},
+    {id:4,title:"Test categorical association",purpose:"Use a contingency table and chi-square test to examine whether two categorical variables are associated."},
+    {id:5,title:"Check relationships and subgroups",purpose:"Assess correlation cautiously and compare aggregate patterns with subgroup evidence."}
+  ];
+  const steps = [
+    {id:"1.1",theme:1,title:"Join the regional support lookup",instruction:"Merge <code>clinic_performance</code> with <code>region_support</code> on the shared region field. Store the result as <code>clinics</code> so later steps use one continuous dataset.",hint:"Use pandas <code>merge()</code>. Keep every clinic row and add the lookup columns using a left join.",deps:[],validator:"('clinics' in globals() and isinstance(clinics, pd.DataFrame) and len(clinics) == len(clinic_performance) and {'funding_band','support_index'}.issubset(clinics.columns) and clinics['clinic_id'].nunique() == clinic_performance['clinic_id'].nunique())"},
+    {id:"1.2",theme:1,title:"Calculate referral completion rate",instruction:"Create <code>referral_completion_rate</code> in <code>clinics</code> by comparing completed referrals with referrals received.",hint:"Divide the completed count by the received count. Store the result as a new column on <code>clinics</code>.",deps:[],validator:"('clinics' in globals() and 'referral_completion_rate' in clinics.columns and np.allclose(clinics['referral_completion_rate'], clinics['referrals_completed']/clinics['referrals_received'], equal_nan=True))"},
+    {id:"1.3",theme:1,title:"Calculate follow-up rate",instruction:"Create <code>followup_rate</code> in <code>clinics</code> using follow-up visits and completed referrals.",hint:"Use the two relevant count columns and create one new rate column. The numerator is follow-up visits.",deps:[],validator:"('clinics' in globals() and 'followup_rate' in clinics.columns and np.allclose(clinics['followup_rate'], clinics['followup_visits']/clinics['referrals_completed'], equal_nan=True))"},
+    {id:"2.1",theme:2,title:"Select the outcome variable",instruction:"Store the <code>patient_outcome_score</code> Series from <code>clinics</code> in a variable called <code>X</code>. This mirrors the notation used for a statistical variable.",hint:"Select one pandas column with square brackets. Keep it as a Series rather than a one-column DataFrame.",deps:[],validator:"('X' in globals() and isinstance(X, pd.Series) and X.name == 'patient_outcome_score' and X.index.equals(clinics.index) and np.allclose(X, clinics['patient_outcome_score']))"},
+    {id:"2.2",theme:2,title:"Estimate the expected value",instruction:"Estimate the expected value of <code>X</code> with the sample mean and store it as <code>expected_outcome</code>.",hint:"Use the pandas method that calculates an arithmetic mean. The result should be one number.",deps:[],validator:"('expected_outcome' in globals() and np.isscalar(expected_outcome) and np.isclose(expected_outcome, X.mean()))"},
+    {id:"2.3",theme:2,title:"Estimate an event probability",instruction:"Estimate the probability of a strong outcome from the binary <code>strong_outcome</code> column. Store the result as <code>p_strong</code>.",hint:"For a column coded as 1 and 0, its mean is the proportion of rows where the event occurred.",deps:[],validator:"('p_strong' in globals() and np.isscalar(p_strong) and np.isclose(p_strong, clinics['strong_outcome'].mean()))"},
+    {id:"2.4",theme:2,title:"Estimate conditional probability",instruction:"Estimate the probability of a strong outcome given that a clinic is NHS-led. Store it as <code>p_strong_given_nhs</code>.",hint:"First filter rows where <code>ownership</code> is <code>'NHS-led'</code>, then calculate the mean of the binary outcome for that subset.",deps:[],validator:"('p_strong_given_nhs' in globals() and np.isscalar(p_strong_given_nhs) and np.isclose(p_strong_given_nhs, clinics.loc[clinics['ownership']=='NHS-led','strong_outcome'].mean()))"},
+    {id:"2.5",theme:2,title:"Create a statistical summary",instruction:"Summarise <code>patient_outcome_score</code>, <code>wait_time_days</code>, <code>spend_per_patient</code> and <code>annual_support_cost</code>. Store mean, median, standard deviation, minimum, maximum, skew and kurtosis in <code>stats_summary</code>.",hint:"Select the four columns, then use <code>agg()</code> with the seven named measures. The measures should form the row index.",deps:[],validator:"('stats_summary' in globals() and isinstance(stats_summary, pd.DataFrame) and set(['mean','median','std','min','max','skew','kurtosis']).issubset(stats_summary.index) and set(['patient_outcome_score','wait_time_days','spend_per_patient','annual_support_cost']).issubset(stats_summary.columns))"},
+    {id:"2.6",theme:2,title:"Visualise the skewed feature",instruction:"Create a histogram of <code>annual_support_cost</code> using Matplotlib. Label the horizontal axis so the plotted measure is clear.",hint:"Use <code>plt.hist()</code> with the Series and choose a sensible number of bins. Add the horizontal label in a separate plotting call.",deps:["matplotlib"],validator:"('plt' in globals() and len(plt.get_fignums()) > 0 and any(ax.get_xlabel().strip() for n in plt.get_fignums() for ax in plt.figure(n).axes))"},
+    {id:"3.1",theme:3,title:"Select NHS-led outcome scores",instruction:"Filter the outcome score for NHS-led clinics and store the resulting Series as <code>nhs_outcomes</code>.",hint:"Use <code>.loc[condition, column]</code> with the ownership condition and the outcome column.",deps:["scipy"],validator:"('nhs_outcomes' in globals() and isinstance(nhs_outcomes, pd.Series) and np.allclose(np.sort(nhs_outcomes), np.sort(clinics.loc[clinics['ownership']=='NHS-led','patient_outcome_score'])))"},
+    {id:"3.2",theme:3,title:"Select charity-led outcome scores",instruction:"Filter the outcome score for charity-led clinics and store the resulting Series as <code>charity_outcomes</code>.",hint:"Repeat the same type of row-and-column filter for the <code>'Charity-led'</code> ownership value.",deps:["scipy"],validator:"('charity_outcomes' in globals() and isinstance(charity_outcomes, pd.Series) and np.allclose(np.sort(charity_outcomes), np.sort(clinics.loc[clinics['ownership']=='Charity-led','patient_outcome_score'])))"},
+    {id:"3.3",theme:3,title:"Calculate the observed mean difference",instruction:"Subtract the charity-led mean outcome from the NHS-led mean outcome. Store the result as <code>observed_difference</code>.",hint:"Calculate one mean from each Series created in the two previous sub-steps, then subtract in the stated order.",deps:["scipy"],validator:"('observed_difference' in globals() and np.isscalar(observed_difference) and np.isclose(observed_difference, nhs_outcomes.mean()-charity_outcomes.mean()))"},
+    {id:"3.4",theme:3,title:"Run Welch’s t-test",instruction:"Run an independent Welch’s t-test on the two outcome Series. Store its outputs as <code>t_statistic</code> and <code>t_p_value</code>.",hint:"Use <code>stats.ttest_ind()</code>. The argument controlling equal variance must reflect Welch’s method.",deps:["scipy"],validator:"('t_statistic' in globals() and 't_p_value' in globals() and np.isclose(t_statistic, stats.ttest_ind(nhs_outcomes,charity_outcomes,equal_var=False).statistic) and np.isclose(t_p_value, stats.ttest_ind(nhs_outcomes,charity_outcomes,equal_var=False).pvalue))"},
+    {id:"3.5",theme:3,title:"Apply the significance threshold",instruction:"Create a Boolean variable <code>t_reject_h0</code> that records whether the t-test p-value is below the supplied <code>alpha</code> level.",hint:"Compare the p-value with <code>alpha</code>. The result should be <code>True</code> or <code>False</code>, not a sentence.",deps:["scipy"],validator:"('t_reject_h0' in globals() and isinstance(t_reject_h0,(bool,np.bool_)) and bool(t_reject_h0) == bool(t_p_value < alpha))"},
+    {id:"4.1",theme:4,title:"Build a contingency table",instruction:"Cross-tabulate <code>ownership</code> against <code>strong_outcome</code> and store the table as <code>contingency_table</code>.",hint:"Use <code>pd.crosstab()</code> with the categorical grouping first and the binary outcome second.",deps:["scipy"],validator:"('contingency_table' in globals() and isinstance(contingency_table,pd.DataFrame) and contingency_table.equals(pd.crosstab(clinics['ownership'],clinics['strong_outcome'])))"},
+    {id:"4.2",theme:4,title:"Run the chi-square test",instruction:"Run a chi-square test of independence on the contingency table. Store all four outputs as <code>chi2_statistic</code>, <code>chi2_p_value</code>, <code>degrees_of_freedom</code> and <code>expected_counts</code>.",hint:"Use <code>stats.chi2_contingency()</code>. It returns four objects in a fixed order.",deps:["scipy"],validator:"('chi2_statistic' in globals() and 'chi2_p_value' in globals() and 'degrees_of_freedom' in globals() and 'expected_counts' in globals() and np.isclose(chi2_statistic,stats.chi2_contingency(contingency_table)[0]) and np.isclose(chi2_p_value,stats.chi2_contingency(contingency_table)[1]) and degrees_of_freedom==stats.chi2_contingency(contingency_table)[2] and np.allclose(expected_counts,stats.chi2_contingency(contingency_table)[3]))"},
+    {id:"4.3",theme:4,title:"Interpret statistical significance",instruction:"Create a Boolean variable <code>chi_reject_h0</code> showing whether the chi-square evidence is significant at the supplied alpha level.",hint:"Compare <code>chi2_p_value</code> with <code>alpha</code>. This answers whether to reject the independence null hypothesis, not whether one variable causes the other.",deps:["scipy"],validator:"('chi_reject_h0' in globals() and isinstance(chi_reject_h0,(bool,np.bool_)) and bool(chi_reject_h0) == bool(chi2_p_value < alpha))"},
+    {id:"5.1",theme:5,title:"Rank correlations with the outcome",instruction:"Calculate correlations among the supplied <code>correlation_columns</code>, select the <code>patient_outcome_score</code> column and sort it from highest to lowest. Store the Series as <code>correlations</code>.",hint:"Use <code>.corr()</code>, select one result column, then use <code>sort_values()</code> in descending order.",deps:[],validator:"('correlations' in globals() and isinstance(correlations,pd.Series) and correlations.index.equals(clinics[correlation_columns].corr()['patient_outcome_score'].sort_values(ascending=False).index) and np.allclose(correlations,clinics[correlation_columns].corr()['patient_outcome_score'].sort_values(ascending=False)))"},
+    {id:"5.2",theme:5,title:"Plot a numeric relationship",instruction:"Create a scatter plot of <code>spend_per_patient</code> against <code>patient_outcome_score</code>. Label both axes.",hint:"Use <code>plt.scatter()</code>. The spending variable belongs on the horizontal axis and the outcome on the vertical axis.",deps:["matplotlib"],validator:"('plt' in globals() and len(plt.get_fignums()) > 0 and any(ax.get_xlabel().strip() and ax.get_ylabel().strip() and len(ax.collections)>0 for n in plt.get_fignums() for ax in plt.figure(n).axes))"},
+    {id:"5.3",theme:5,title:"Create an aggregate regional summary",instruction:"Group clinics by <code>region</code> and calculate the mean <code>spend_per_patient</code> and mean <code>patient_outcome_score</code>. Store the table as <code>regional_summary</code>.",hint:"Use <code>groupby()</code> with <code>agg()</code>. The result should contain one row per region and the two requested mean columns.",deps:[],validator:"('regional_summary' in globals() and isinstance(regional_summary,pd.DataFrame) and set(regional_summary.index)==set(clinics['region']) and {'spend_per_patient','patient_outcome_score'}.issubset(regional_summary.columns) and np.allclose(regional_summary.sort_index()[['spend_per_patient','patient_outcome_score']], clinics.groupby('region')[['spend_per_patient','patient_outcome_score']].mean().sort_index()))"},
+    {id:"5.4",theme:5,title:"Compare funding subgroups within regions",instruction:"Group clinics by both <code>region</code> and <code>funding_band</code>. Calculate mean spending and mean outcome score, and store the result as <code>subgroup_summary</code>.",hint:"Pass both grouping columns as a list to <code>groupby()</code>, then aggregate the same two numerical measures used in the previous sub-step.",deps:[],validator:"('subgroup_summary' in globals() and isinstance(subgroup_summary,pd.DataFrame) and subgroup_summary.index.nlevels==2 and {'spend_per_patient','patient_outcome_score'}.issubset(subgroup_summary.columns) and np.allclose(subgroup_summary.sort_index()[['spend_per_patient','patient_outcome_score']], clinics.groupby(['region','funding_band'])[['spend_per_patient','patient_outcome_score']].mean().sort_index()))"}
+  ];
+
+  const setupPython = String.raw`
+import io, contextlib, traceback, base64
+import numpy as np
+import pandas as pd
+
+np.random.seed(41)
+n = 240
+regions = np.array(['North','South','East','West'])
+region = np.random.choice(regions, n, p=[0.24,0.27,0.25,0.24])
+ownership = np.where(np.random.random(n) < np.select([region=='North',region=='South',region=='East'],[0.62,0.43,0.54],default=0.36), 'NHS-led', 'Charity-led')
+region_effect = pd.Series(region).map({'North':2.5,'South':-1.0,'East':1.0,'West':-2.0}).to_numpy()
+ownership_effect = np.where(ownership=='NHS-led',3.2,0.0)
+support_index_base = pd.Series(region).map({'North':78,'South':58,'East':70,'West':50}).to_numpy()
+referrals_received = np.random.poisson(980, n) + 180
+completion_probability = np.clip(0.70 + ownership_effect/55 + region_effect/100 + np.random.normal(0,0.045,n),0.52,0.93)
+referrals_completed = np.maximum(1, np.rint(referrals_received*completion_probability).astype(int))
+followup_visits = np.rint(referrals_completed*np.clip(np.random.normal(0.72,0.08,n),0.45,0.94)).astype(int)
+spend_per_patient = np.clip(420 + support_index_base*5.2 + np.random.normal(0,95,n),390,1100)
+wait_time_days = np.clip(24 - support_index_base/5.5 - ownership_effect/2 + np.random.gamma(2.1,2.2,n),2,35)
+annual_support_cost = np.random.lognormal(mean=11.15,sigma=0.82,size=n)
+patient_satisfaction = np.clip(59 + support_index_base*.22 + ownership_effect*.7 - wait_time_days*.30 + np.random.normal(0,5,n),42,96)
+patient_outcome_score = np.clip(48 + spend_per_patient*.024 + patient_satisfaction*.20 - wait_time_days*.33 + ownership_effect + region_effect + np.random.normal(0,4.8,n),40,98)
+strong_outcome = (patient_outcome_score >= 76).astype(int)
+
+clinic_performance = pd.DataFrame({
+    'clinic_id':[f'C{i:03d}' for i in range(1,n+1)], 'region':region, 'ownership':ownership,
+    'referrals_received':referrals_received, 'referrals_completed':referrals_completed,
+    'followup_visits':followup_visits, 'wait_time_days':wait_time_days.round(1),
+    'spend_per_patient':spend_per_patient.round(2), 'annual_support_cost':annual_support_cost.round(2),
+    'patient_satisfaction':patient_satisfaction.round(1), 'patient_outcome_score':patient_outcome_score.round(1),
+    'strong_outcome':strong_outcome
+})
+region_support = pd.DataFrame({
+    'region':['North','South','East','West'],
+    'funding_band':['Enhanced','Core','Enhanced','Core'],
+    'support_index':[78,58,70,50]
+})
+alpha = 0.05
+correlation_columns = ['patient_outcome_score','spend_per_patient','patient_satisfaction','wait_time_days','annual_support_cost']
+
+def _run_learner(code):
+    stream = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(stream), contextlib.redirect_stderr(stream):
+            exec(code, globals())
+        return {'ok':True,'output':stream.getvalue(),'error':''}
+    except Exception:
+        return {'ok':False,'output':stream.getvalue(),'error':traceback.format_exc(limit=2)}
+
+def _safe_eval_validator(expression):
+    try:
+        return bool(eval('(' + expression + ')', globals()))
+    except Exception:
+        return False
+
+def _collect_figures():
+    if 'plt' not in globals():
+        return []
+    images=[]
+    for number in list(plt.get_fignums()):
+        buffer=io.BytesIO()
+        plt.figure(number).savefig(buffer,format='png',dpi=120,bbox_inches='tight')
+        images.append(base64.b64encode(buffer.getvalue()).decode('ascii'))
+    plt.close('all')
+    return images
+
+_PROTECTED_KEYS=set(globals().keys())
+def _reset_learner_state():
+    for key in list(globals().keys()):
+        if key not in _PROTECTED_KEYS and not key.startswith('_'):
+            globals().pop(key,None)
+`;
+
+  let pyodide=null, current=0, completed=steps.map(()=>false), running=false;
+  const $=id=>document.getElementById(id);
+  const htmlEscape=value=>String(value).replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  function setStatus(text,state=''){const box=$('runtimeStatus'); box.className='status'+(state?' '+state:''); $('runtimeText').textContent=text;}
+  async function initialise(){
+    try{
+      setStatus('Starting Python…');
+      pyodide=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'});
+      setStatus('Loading the practice dataset…');
+      await pyodide.loadPackage(['numpy','pandas']);
+      await pyodide.runPythonAsync(setupPython);
+      const perf=pyodide.runPython("clinic_performance.head(6).to_html(index=False,classes='dataframe',border=0)");
+      const lookup=pyodide.runPython("region_support.to_html(index=False,classes='dataframe',border=0)");
+      $('datasetPreview').innerHTML=`<div><div class="table-label">Clinic performance</div><div class="table-wrap">${perf}</div></div><div><div class="table-label">Region support lookup</div><div class="table-wrap">${lookup}</div></div>`;
+      setStatus('Python runtime ready.','ready');
+      render();
+    }catch(error){setStatus('Python could not start: '+error.message,'error'); $('activity').innerHTML='<div class="completion"><h2>Runtime unavailable</h2><p>'+htmlEscape(error.message)+'</p></div>';}
+  }
+  async function ensureDependencies(deps){
+    if(!deps||!deps.length)return;
+    const needsSciPy=deps.includes('scipy')&&!pyodide.globals.has('stats');
+    const needsPlot=deps.includes('matplotlib')&&!pyodide.globals.has('plt');
+    if(needsSciPy||needsPlot){
+      setStatus(needsPlot?'Loading statistical and plotting tools…':'Loading statistical tools…');
+      const packages=[]; if(needsSciPy)packages.push('scipy'); if(needsPlot)packages.push('matplotlib');
+      await pyodide.loadPackage(packages);
+      if(needsSciPy)await pyodide.runPythonAsync('from scipy import stats');
+      if(needsPlot)await pyodide.runPythonAsync("import matplotlib; matplotlib.use('AGG'); import matplotlib.pyplot as plt");
+      setStatus('Python runtime ready.','ready');
+    }
+  }
+  function renderNavigation(){
+    const done=completed.filter(Boolean).length; $('overallCount').textContent=`${done}/${steps.length}`; $('progressFill').style.width=`${done/steps.length*100}%`;
+    $('navigation').innerHTML=themes.map(theme=>{
+      const members=steps.map((s,i)=>({s,i})).filter(x=>x.s.theme===theme.id), count=members.filter(x=>completed[x.i]).length;
+      const rows=members.map(({s,i})=>`<div class="step-nav ${completed[i]?'done':i===current?'current':''}">${completed[i]?'✓':i===current?'▶':'○'} ${s.id} ${s.title}</div>`).join('');
+      return `<div class="theme-nav"><div class="theme-nav-head"><span>Theme ${theme.id}</span><span class="theme-count">${count}/${members.length} complete</span></div>${rows}</div>`;
+    }).join('');
+  }
+  function nextLabel(index){if(index===steps.length-1)return'Finish activity'; return steps[index+1].theme!==steps[index].theme?'Next theme':'Next sub-step';}
+  function render(){
+    renderNavigation();
+    if(current>=steps.length){renderCompletion();return;}
+    const step=steps[current],theme=themes.find(t=>t.id===step.theme);
+    $('activity').innerHTML=`<div class="theme-banner"><div class="theme-kicker">Theme ${theme.id}</div><h2>${theme.title}</h2><p>${theme.purpose}</p></div><div class="step-body"><div class="step-number">Sub-step ${step.id}</div><h3>${step.title}</h3><div class="instruction">${step.instruction}</div><div class="hint"><strong>Hint</strong>${step.hint}</div><textarea id="codeEditor" aria-label="Python code for sub-step ${step.id}" spellcheck="false"></textarea><div class="buttons"><button id="runButton" class="button run">▶ Run step</button><button id="nextButton" class="button next" disabled>${nextLabel(current)} →</button></div><div id="feedback" class="feedback"></div><div class="output-label">Output</div><div id="output" class="output">Your Python output will appear here.</div><div id="plots" class="plots"></div></div>`;
+    $('runButton').addEventListener('click',runStep); $('nextButton').addEventListener('click',()=>{current+=1;render();window.scrollTo({top:$('activity').offsetTop-12,behavior:'smooth'});});
+  }
+  async function runStep(){
+    if(running||!pyodide)return; const code=$('codeEditor').value.trim(),feedback=$('feedback'),output=$('output');
+    if(!code){feedback.className='feedback warn';feedback.textContent='Enter some Python code before running the step.';return;}
+    running=true;$('runButton').disabled=true;feedback.className='feedback';output.textContent='Running…';$('plots').innerHTML='';
+    try{
+      const step=steps[current]; await ensureDependencies(step.deps);
+      pyodide.globals.set('_learner_code_js',code); const proxy=await pyodide.runPythonAsync('_run_learner(_learner_code_js)'); const result=proxy.toJs({dict_converter:Object.fromEntries}); proxy.destroy();
+      output.textContent=result.output||result.error||'(Code ran without printed output.)';
+      if(!result.ok){feedback.className='feedback fail';feedback.textContent='The code could not be completed. Review the Python output and try again.';return;}
+      pyodide.globals.set('_validator_expr_js',step.validator); const valid=pyodide.runPython('_safe_eval_validator(_validator_expr_js)');
+      const figsProxy=pyodide.runPython('_collect_figures()'); const figs=figsProxy.toJs(); figsProxy.destroy();
+      $('plots').innerHTML=Array.from(figs).map((img,i)=>`<img alt="Plot produced for sub-step ${step.id}, figure ${i+1}" src="data:image/png;base64,${img}">`).join('');
+      if(!valid){feedback.className='feedback warn';feedback.textContent='The code ran, but it has not completed this step yet. Review the instruction and hint, then try again.';return;}
+      completed[current]=true;feedback.className='feedback success';feedback.textContent='✅ Step completed';$('codeEditor').disabled=true;$('runButton').disabled=true;$('nextButton').disabled=false;renderNavigation();
+    }catch(error){output.textContent=error.stack||error.message;feedback.className='feedback fail';feedback.textContent='The code could not be completed. Review the Python output and try again.';}
+    finally{running=false;if(!completed[current]&&$('runButton'))$('runButton').disabled=false;}
+  }
+  function renderCompletion(){
+    $('activity').innerHTML='<div class="completion"><div class="tick">✅</div><h2>Activity complete</h2><p>You prepared comparable rates, described distributions and probabilities, tested numerical and categorical differences, and checked whether aggregate relationships held across subgroups.</p><button id="restartButton" class="button next">↻ Restart activity</button></div>';
+    $('restartButton').addEventListener('click',async()=>{await pyodide.runPythonAsync(setupPython);completed=steps.map(()=>false);current=0;render();});
+  }
+  renderNavigation(); initialise();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+[{"user_id": 1, "name": "Alice", "details": {"login_count": 5, "plan": "premium"}}, {"user_id": 2, "name": "Bob", "details": {"login_count": 1, "plan": "free"}}, {"user_id": 3, "name": "Charlie", "details": {"login_count": 10, "plan": "premium"}}]

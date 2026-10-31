@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statistics for Feature Selection — Interactive Practice</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+  <style>
+    :root{--ink:#152033;--muted:#5d6878;--line:#d9e0e8;--blue:#1769e0;--blue-soft:#edf5ff;--green:#138a5b;--green-soft:#eaf8f2;--orange:#b65713;--orange-soft:#fff5e9;--navy:#102a43;--paper:#fff;--canvas:#f3f6fa}
+    *{box-sizing:border-box} body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    header{background:linear-gradient(125deg,#0e2842,#175ea8);color:#fff;padding:28px clamp(18px,4vw,56px)}
+    .brand{font-size:.78rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;opacity:.82}.hero{max-width:1180px;margin:auto}.hero h1{font-size:clamp(1.8rem,4vw,3.1rem);line-height:1.08;margin:10px 0}.hero p{max-width:760px;margin:0;color:#dcecff}
+    main{max-width:1180px;margin:24px auto 48px;padding:0 18px}.status{display:flex;gap:10px;align-items:center;border:1px solid #bfd3ea;background:#f4f9ff;border-radius:12px;padding:12px 15px;margin-bottom:18px}.dot{width:11px;height:11px;border-radius:50%;background:#e39b2d;box-shadow:0 0 0 4px #f9e8c8}.status.ready .dot{background:var(--green);box-shadow:0 0 0 4px #cceee0}.status.error{background:#fff1f1;border-color:#efb7b7}.status.error .dot{background:#c73535;box-shadow:0 0 0 4px #f6d5d5}
+    .preview-card,.nav-card,.activity-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(33,53,76,.06)}.preview-card{padding:18px;margin-bottom:20px}.preview-head{display:flex;justify-content:space-between;gap:16px;align-items:start}.preview-head h2{margin:0;font-size:1.1rem}.preview-head p{margin:4px 0 0;color:var(--muted);font-size:.92rem}.scenario-tag{white-space:nowrap;border-radius:999px;background:#e8f2ff;color:#1256a4;padding:5px 10px;font-weight:750;font-size:.78rem}.tables{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:14px;overflow:auto}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}.table-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted);margin:0 0 6px}.dataframe{width:100%;border-collapse:collapse;font-size:.8rem}.dataframe th,.dataframe td{padding:7px 9px;border-bottom:1px solid #e8edf2;text-align:left;white-space:nowrap}.dataframe th{background:#f7f9fc;color:#3c4a5e}.workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}.nav-card{padding:16px;position:sticky;top:16px}.nav-title{display:flex;justify-content:space-between;align-items:center}.nav-title h2{font-size:1rem;margin:0}.progress-track{height:9px;background:#e7ebf0;border-radius:99px;overflow:hidden;margin:12px 0 16px}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#1769e0,#18a47a);transition:width .25s}.theme-nav{margin:13px 0 5px}.theme-nav-head{display:flex;justify-content:space-between;gap:8px;font-size:.83rem;font-weight:800;color:#33425a}.theme-count{font-size:.72rem;color:var(--muted)}.step-nav{padding:7px 9px;margin-top:5px;border-left:3px solid #d5dce5;border-radius:5px;color:#778294;font-size:.78rem}.step-nav.current{background:var(--blue-soft);border-color:var(--blue);color:#174e96;font-weight:750}.step-nav.done{background:var(--green-soft);border-color:var(--green);color:#126443}.step-nav.skipped{background:#fff8e8;border-color:#d08a1d;color:#80500d}.activity-card{overflow:hidden}.theme-banner{background:linear-gradient(100deg,#edf5ff,#f7fbff);border-bottom:1px solid #cfe0f4;padding:18px 22px}.theme-kicker{color:#1559a5;font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em}.theme-banner h2{margin:3px 0;font-size:1.25rem}.theme-banner p{margin:0;color:#52647b;font-size:.92rem}.step-body{padding:23px}.step-number{font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:850}.step-body h3{font-size:1.45rem;margin:3px 0 8px}.instruction{color:#334158;margin-bottom:16px}.hint{border-left:4px solid #d68524;background:var(--orange-soft);padding:11px 13px;border-radius:7px;margin-bottom:14px;color:#75400f}.hint strong{display:block;color:#8a460a;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}textarea{width:100%;min-height:155px;resize:vertical;border:1px solid #aeb9c7;border-radius:9px;padding:13px;background:#101826;color:#e9f1fb;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:4}textarea:focus{outline:3px solid #cfe4ff;border-color:#2c72cf}textarea:disabled{opacity:.78}.buttons{display:flex;gap:9px;margin:12px 0}.button{appearance:none;border:0;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer}.button:disabled{cursor:not-allowed;opacity:.45}.run{background:var(--green);color:#fff}.skip{background:#fff1d7;color:#7a4705;border:1px solid #d79731}.next{background:var(--blue);color:#fff}.output-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:#586579;margin:14px 0 6px}.output{min-height:66px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:11px;white-space:pre-wrap;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto}.feedback{display:none;margin-top:10px;padding:10px 12px;border-radius:7px}.feedback.success{display:block;background:var(--green-soft);border-left:4px solid var(--green);color:#126443}.feedback.warn{display:block;background:var(--orange-soft);border-left:4px solid #d37a17;color:#7a420f}.feedback.fail{display:block;background:#fff0f0;border-left:4px solid #d14242;color:#8f2323}.plots img{max-width:100%;margin-top:12px;border:1px solid var(--line);border-radius:8px;background:#fff}.expected{margin-top:14px;border:1px solid #bfd3ea;border-radius:9px;background:#f5f9ff;overflow:hidden}.expected summary{cursor:pointer;padding:10px 12px;color:#164f91;font-weight:800}.expected-content{border-top:1px solid #d5e4f5;padding:11px 13px;color:#34445a;font-size:.9rem}.expected-content pre{margin:7px 0 0;padding:9px;background:#fff;border:1px solid #dbe4ee;border-radius:7px;overflow:auto;font-size:.78rem}.completion{padding:34px;text-align:center}.completion .tick{font-size:3rem}.completion h2{margin:5px 0}.completion p{max-width:650px;margin:8px auto 20px;color:var(--muted)}.footer-note{text-align:center;color:#718096;font-size:.75rem;margin-top:22px}@media(max-width:900px){.workspace{grid-template-columns:1fr}.nav-card{position:static}.tables{grid-template-columns:1fr}}@media(max-width:600px){.scenario-tag{display:none}.step-body{padding:18px}.buttons{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <header><div class="hero"><div class="brand">Decoded · Learner Practice</div><h1>Statistics for feature selection</h1><p>Use distribution diagnostics, transformation evidence and ANOVA to guide feature decisions in a new commercial-building energy scenario.</p></div></header>
+  <main>
+    <div id="runtimeStatus" class="status"><span class="dot"></span><span id="runtimeText">Starting Python…</span></div>
+    <section class="preview-card">
+      <div class="preview-head"><div><h2>Practice dataset preview</h2><p>Each row is a commercial building that has participated in an energy-efficiency retrofit programme.</p></div><span class="scenario-tag">360 buildings · fixed seed</span></div>
+      <div id="datasetPreview" class="tables" style="grid-template-columns:1fr"><span>Loading the practice dataset…</span></div>
+    </section>
+    <div class="workspace">
+      <aside class="nav-card"><div class="nav-title"><h2>Activity progress</h2><strong id="overallCount">0/23</strong></div><div class="progress-track"><div id="progressFill" class="progress-fill"></div></div><div id="navigation"></div></aside>
+      <section id="activity" class="activity-card"></section>
+    </div>
+    <div class="footer-note">Runs locally in your browser using Pyodide. No external dataset is required.</div>
+  </main>
+  <script>
+  "use strict";
+  const themes = [
+    {id:1,title:"Create a leakage-safe modelling split",purpose:"Define the regression target and reserve unseen test data before making distribution or feature decisions."},
+    {id:2,title:"Prioritise distribution diagnostics",purpose:"Use training-data skew, kurtosis and a Q–Q plot to identify numerical features worth investigating."},
+    {id:3,title:"Test evidence against normality",purpose:"Combine Shapiro–Wilk and an approximate standardised K–S diagnostic without turning p-values into automatic removal rules."},
+    {id:4,title:"Test a target transformation",purpose:"Compare the original right-skewed target with a log1p representation using training data only."},
+    {id:5,title:"Screen a categorical feature with ANOVA",purpose:"Test whether mean energy savings differ across retrofit programmes while keeping predictive usefulness as a separate question."}
+  ];
+  const steps = [
+    {id:"1.1",theme:1,title:"Define the regression target",instruction:"Create <code>TARGET_COLUMN</code> containing the name of the numerical outcome the model will predict: <code>annual_energy_savings</code>.",hint:"Assign the supplied column name to a string variable. Use assignment, not a comparison.",deps:[],validator:"('TARGET_COLUMN' in globals() and TARGET_COLUMN == 'annual_energy_savings')"},
+    {id:"1.2",theme:1,title:"Keep rows with a known target",instruction:"Create <code>model_data</code> as a copy of <code>building_data</code> with rows missing the target removed.",hint:"Use <code>dropna()</code> with the target column as its subset, then take a copy.",deps:[],validator:"('model_data' in globals() and isinstance(model_data,pd.DataFrame) and len(model_data)==building_data[TARGET_COLUMN].notna().sum() and model_data[TARGET_COLUMN].notna().all() and set(model_data.index)==set(building_data.dropna(subset=[TARGET_COLUMN]).index))"},
+    {id:"1.3",theme:1,title:"Separate predictors and target",instruction:"Create <code>X_raw</code> without the target column and create <code>y</code> as a copy of the target Series.",hint:"Use <code>drop(columns=[...])</code> for the predictors and select the target column separately.",deps:[],validator:"('X_raw' in globals() and 'y' in globals() and isinstance(X_raw,pd.DataFrame) and isinstance(y,pd.Series) and TARGET_COLUMN not in X_raw.columns and X_raw.equals(model_data.drop(columns=[TARGET_COLUMN])) and y.equals(model_data[TARGET_COLUMN]))"},
+    {id:"1.4",theme:1,title:"Create training and test sets",instruction:"Split <code>X_raw</code> and <code>y</code> into <code>X_train_raw</code>, <code>X_test_raw</code>, <code>y_train</code> and <code>y_test</code>. Reserve 25% for testing and use <code>RANDOM_STATE</code>.",hint:"Use <code>train_test_split()</code> with four outputs, <code>test_size=0.25</code> and the supplied random-state constant.",deps:["sklearn"],validator:"('X_train_raw' in globals() and 'X_test_raw' in globals() and 'y_train' in globals() and 'y_test' in globals() and len(X_train_raw)==264 and len(X_test_raw)==88 and len(y_train)==264 and len(y_test)==88 and set(X_train_raw.index).isdisjoint(set(X_test_raw.index)) and set(X_train_raw.index)|set(X_test_raw.index)==set(model_data.index) and set(y_train.index)==set(X_train_raw.index) and set(y_test.index)==set(X_test_raw.index))"},
+    {id:"2.1",theme:2,title:"Select numerical training features",instruction:"Select only numerical columns from <code>X_train_raw</code> and store them as <code>numeric_train</code>.",hint:"Use <code>select_dtypes()</code> on the training predictors and include numerical data types.",deps:[],validator:"('numeric_train' in globals() and isinstance(numeric_train,pd.DataFrame) and numeric_train.equals(X_train_raw.select_dtypes(include='number')))"},
+    {id:"2.2",theme:2,title:"Calculate feature skew",instruction:"Calculate skew for every column in <code>numeric_train</code> and store the Series as <code>feature_skew</code>.",hint:"Use the pandas method for the third-moment measure on the numerical training DataFrame.",deps:[],validator:"('feature_skew' in globals() and isinstance(feature_skew,pd.Series) and feature_skew.index.equals(numeric_train.skew().index) and np.allclose(feature_skew,numeric_train.skew(),equal_nan=True))"},
+    {id:"2.3",theme:2,title:"Calculate excess kurtosis",instruction:"Calculate excess kurtosis for every numerical training feature and store the Series as <code>feature_kurtosis</code>.",hint:"Use the pandas DataFrame method named for kurtosis. A normal-like distribution has excess kurtosis near zero.",deps:[],validator:"('feature_kurtosis' in globals() and isinstance(feature_kurtosis,pd.Series) and feature_kurtosis.index.equals(numeric_train.kurt().index) and np.allclose(feature_kurtosis,numeric_train.kurt(),equal_nan=True))"},
+    {id:"2.4",theme:2,title:"Shortlist strongly skewed features",instruction:"Create <code>priority_features</code> containing numerical features with more than two unique values and absolute skew of at least <code>SKEW_THRESHOLD</code>.",hint:"Combine a uniqueness condition with <code>feature_skew.abs()</code>. Return the selected index labels as a list.",deps:[],validator:"('priority_features' in globals() and isinstance(priority_features,list) and set(priority_features)==set(feature_skew.index[(numeric_train.nunique()>2)&(feature_skew.abs()>=SKEW_THRESHOLD)]))"},
+    {id:"2.5",theme:2,title:"Choose a feature to investigate",instruction:"Set <code>diagnostic_feature</code> to <code>maintenance_cost</code>, one of the strongly skewed features identified for deeper investigation.",hint:"Store the specified feature name as a string and confirm it appears in your shortlist.",deps:[],validator:"('diagnostic_feature' in globals() and diagnostic_feature=='maintenance_cost' and diagnostic_feature in priority_features)"},
+    {id:"2.6",theme:2,title:"Create a Q–Q plot",instruction:"Create a normal Q–Q plot for the non-missing training values of <code>diagnostic_feature</code>. Give the chart a descriptive title.",hint:"Use <code>stats.probplot()</code> with <code>dist='norm'</code> and Matplotlib as the plotting target.",deps:["scipy","matplotlib"],validator:"('plt' in globals() and len(plt.get_fignums())>0 and any(len(ax.lines)>=1 and ax.get_title().strip() for n in plt.get_fignums() for ax in plt.figure(n).axes))"},
+    {id:"3.1",theme:3,title:"Prepare values for testing",instruction:"Convert the selected training feature to numeric, drop missing values and store the resulting Series as <code>tested_values</code>.",hint:"Use <code>pd.to_numeric()</code> with coercion, then remove missing values. This dataset is below the 5,000-value sampling cap.",deps:["scipy"],validator:"('tested_values' in globals() and isinstance(tested_values,pd.Series) and tested_values.equals(pd.to_numeric(X_train_raw[diagnostic_feature],errors='coerce').dropna()) and len(tested_values)>=3 and tested_values.nunique()>=3)"},
+    {id:"3.2",theme:3,title:"Run the Shapiro–Wilk test",instruction:"Run Shapiro–Wilk on <code>tested_values</code> and store the two outputs as <code>shapiro_statistic</code> and <code>shapiro_p_value</code>.",hint:"Use <code>stats.shapiro()</code>. It returns a test statistic followed by a p-value.",deps:["scipy"],validator:"('shapiro_statistic' in globals() and 'shapiro_p_value' in globals() and np.isclose(shapiro_statistic,stats.shapiro(tested_values).statistic) and np.isclose(shapiro_p_value,stats.shapiro(tested_values).pvalue))"},
+    {id:"3.3",theme:3,title:"Standardise the tested values",instruction:"Create <code>standardised_values</code> with mean zero and sample standard deviation one using <code>tested_values</code>.",hint:"Subtract the Series mean and divide by its standard deviation using <code>ddof=1</code>.",deps:["scipy"],validator:"('standardised_values' in globals() and isinstance(standardised_values,pd.Series) and len(standardised_values)==len(tested_values) and np.isclose(standardised_values.mean(),0,atol=1e-10) and np.isclose(standardised_values.std(ddof=1),1,atol=1e-10) and np.allclose(standardised_values,(tested_values-tested_values.mean())/tested_values.std(ddof=1)))"},
+    {id:"3.4",theme:3,title:"Run the K–S diagnostic",instruction:"Compare <code>standardised_values</code> with a standard normal distribution. Store the outputs as <code>ks_statistic</code> and <code>ks_p_value</code>.",hint:"Use <code>stats.kstest()</code> and name the theoretical distribution <code>'norm'</code>.",deps:["scipy"],validator:"('ks_statistic' in globals() and 'ks_p_value' in globals() and np.isclose(ks_statistic,stats.kstest(standardised_values,'norm').statistic) and np.isclose(ks_p_value,stats.kstest(standardised_values,'norm').pvalue))"},
+    {id:"4.1",theme:4,title:"Prepare the training target",instruction:"Convert <code>y_train</code> to numeric, drop missing values and store the Series as <code>target_values</code>.",hint:"Use the same numeric-conversion and missing-value pattern used for the diagnostic feature.",deps:[],validator:"('target_values' in globals() and isinstance(target_values,pd.Series) and target_values.equals(pd.to_numeric(y_train,errors='coerce').dropna()) and (target_values>=0).all())"},
+    {id:"4.2",theme:4,title:"Measure target skew",instruction:"Calculate the skew of <code>target_values</code> and store the scalar as <code>target_skew</code>.",hint:"Use the pandas Series method that measures asymmetry.",deps:[],validator:"('target_skew' in globals() and np.isscalar(target_skew) and np.isclose(target_skew,target_values.skew()))"},
+    {id:"4.3",theme:4,title:"Visualise the target distribution",instruction:"Create a histogram of <code>target_values</code> and add vertical reference lines for its mean and median. Label both axes.",hint:"Use <code>plt.hist()</code> once and <code>plt.axvline()</code> twice, with one reference for each measure of centre.",deps:["matplotlib"],validator:"('plt' in globals() and len(plt.get_fignums())>0 and any(len(ax.patches)>0 and len(ax.lines)>=2 and ax.get_xlabel().strip() and ax.get_ylabel().strip() for n in plt.get_fignums() for ax in plt.figure(n).axes))"},
+    {id:"4.4",theme:4,title:"Apply log1p to the target",instruction:"Transform the non-negative training target with <code>np.log1p()</code> and store it as <code>log_target_values</code>.",hint:"Apply the NumPy transformation directly to <code>target_values</code>. It safely handles values of zero.",deps:[],validator:"('log_target_values' in globals() and len(log_target_values)==len(target_values) and np.allclose(log_target_values,np.log1p(target_values)))"},
+    {id:"4.5",theme:4,title:"Compare skew before and after",instruction:"Create <code>skew_comparison</code> with columns <code>target_version</code>, <code>skew</code> and <code>absolute_skew</code>, and rows for the original and log-transformed target.",hint:"Build a two-row DataFrame. Calculate each skew from its corresponding Series and take absolute values for the final column.",deps:[],validator:"('skew_comparison' in globals() and isinstance(skew_comparison,pd.DataFrame) and list(skew_comparison.columns)==['target_version','skew','absolute_skew'] and len(skew_comparison)==2 and np.allclose(skew_comparison['skew'],[target_values.skew(),pd.Series(log_target_values).skew()]) and np.allclose(skew_comparison['absolute_skew'],np.abs(skew_comparison['skew'])))"},
+    {id:"5.1",theme:5,title:"Prepare data for ANOVA",instruction:"Create <code>anova_data</code> from <code>model_data</code> using only <code>retrofit_programme</code> and the target, with missing rows removed.",hint:"Select the categorical group column and <code>TARGET_COLUMN</code>, then call <code>dropna()</code>.",deps:["scipy"],validator:"('anova_data' in globals() and isinstance(anova_data,pd.DataFrame) and anova_data.equals(model_data[['retrofit_programme',TARGET_COLUMN]].dropna()))"},
+    {id:"5.2",theme:5,title:"Create programme groups",instruction:"Create <code>programme_groups</code>, a list containing one target-value array for each retrofit programme in <code>anova_data</code>.",hint:"Group by <code>retrofit_programme</code>, then collect the target values from each group in a list comprehension.",deps:["scipy"],validator:"('programme_groups' in globals() and isinstance(programme_groups,list) and len(programme_groups)==anova_data['retrofit_programme'].nunique() and sorted(len(g) for g in programme_groups)==sorted(anova_data.groupby('retrofit_programme').size().tolist()) and sum(len(g) for g in programme_groups)==len(anova_data))"},
+    {id:"5.3",theme:5,title:"Run one-way ANOVA",instruction:"Run one-way ANOVA across <code>programme_groups</code>. Store the outputs as <code>f_statistic</code> and <code>p_value</code>.",hint:"Use <code>stats.f_oneway()</code> and unpack the list of group arrays with <code>*</code>.",deps:["scipy"],validator:"('f_statistic' in globals() and 'p_value' in globals() and np.isclose(f_statistic,stats.f_oneway(*programme_groups).statistic) and np.isclose(p_value,stats.f_oneway(*programme_groups).pvalue))"},
+    {id:"5.4",theme:5,title:"Apply the ANOVA decision rule",instruction:"Create Boolean <code>anova_reject_h0</code> showing whether the ANOVA p-value is below <code>ALPHA</code>.",hint:"Compare the p-value with the supplied alpha level. This indicates evidence of a mean difference, not causation or guaranteed model improvement.",deps:["scipy"],validator:"('anova_reject_h0' in globals() and isinstance(anova_reject_h0,(bool,np.bool_)) and bool(anova_reject_h0)==bool(p_value<ALPHA))"}
+  ];
+
+  const solutionCodes = {
+    "1.1":"TARGET_COLUMN = 'annual_energy_savings'",
+    "1.2":"model_data = building_data.dropna(subset=[TARGET_COLUMN]).copy()",
+    "1.3":"X_raw = model_data.drop(columns=[TARGET_COLUMN])\ny = model_data[TARGET_COLUMN].copy()",
+    "1.4":"X_train_raw, X_test_raw, y_train, y_test = train_test_split(\n    X_raw, y, test_size=0.25, random_state=RANDOM_STATE\n)",
+    "2.1":"numeric_train = X_train_raw.select_dtypes(include='number')",
+    "2.2":"feature_skew = numeric_train.skew()",
+    "2.3":"feature_kurtosis = numeric_train.kurt()",
+    "2.4":"priority_features = feature_skew.index[\n    (numeric_train.nunique() > 2) & (feature_skew.abs() >= SKEW_THRESHOLD)\n].tolist()",
+    "2.5":"diagnostic_feature = 'maintenance_cost'",
+    "2.6":"qq_values = pd.to_numeric(X_train_raw[diagnostic_feature], errors='coerce').dropna()\nplt.figure(figsize=(6, 5))\nstats.probplot(qq_values, dist='norm', plot=plt)\nplt.title(f'Q–Q plot: {diagnostic_feature}')\nplt.tight_layout()\nplt.show()",
+    "3.1":"tested_values = pd.to_numeric(\n    X_train_raw[diagnostic_feature], errors='coerce'\n).dropna()",
+    "3.2":"shapiro_statistic, shapiro_p_value = stats.shapiro(tested_values)",
+    "3.3":"standardised_values = (\n    tested_values - tested_values.mean()\n) / tested_values.std(ddof=1)",
+    "3.4":"ks_statistic, ks_p_value = stats.kstest(standardised_values, 'norm')",
+    "4.1":"target_values = pd.to_numeric(y_train, errors='coerce').dropna()",
+    "4.2":"target_skew = target_values.skew()",
+    "4.3":"plt.figure(figsize=(8, 4))\nplt.hist(target_values, bins=20, edgecolor='white')\nplt.axvline(target_values.mean(), linestyle='--', label='Mean')\nplt.axvline(target_values.median(), linestyle=':', label='Median')\nplt.xlabel('Annual energy savings')\nplt.ylabel('Number of buildings')\nplt.legend()\nplt.tight_layout()\nplt.show()",
+    "4.4":"log_target_values = np.log1p(target_values)",
+    "4.5":"skew_comparison = pd.DataFrame({\n    'target_version': ['Original energy savings', 'Log-transformed energy savings'],\n    'skew': [target_values.skew(), pd.Series(log_target_values).skew()],\n    'absolute_skew': [abs(target_values.skew()), abs(pd.Series(log_target_values).skew())]\n})",
+    "5.1":"anova_data = model_data[['retrofit_programme', TARGET_COLUMN]].dropna()",
+    "5.2":"programme_groups = [\n    group[TARGET_COLUMN].values\n    for _, group in anova_data.groupby('retrofit_programme')\n]",
+    "5.3":"f_statistic, p_value = stats.f_oneway(*programme_groups)",
+    "5.4":"anova_reject_h0 = p_value < ALPHA"
+  };
+
+  const resultExpressions = {
+    "1.1":"f'Target: {TARGET_COLUMN}'",
+    "1.2":"f'Rows available for modelling: {len(model_data)}\\nMissing targets: {model_data[TARGET_COLUMN].isna().sum()}'",
+    "1.3":"f'X_raw shape: {X_raw.shape}\\ny length: {len(y)}'",
+    "1.4":"f'Training features: {X_train_raw.shape}\\nTest features: {X_test_raw.shape}'",
+    "2.1":"f'Shape: {numeric_train.shape}\\nColumns: {numeric_train.columns.tolist()}'",
+    "2.2":"feature_skew.sort_values(ascending=False).round(3).to_string()",
+    "2.3":"feature_kurtosis.sort_values(ascending=False).round(3).to_string()",
+    "2.4":"str(priority_features)",
+    "2.5":"f'Diagnostic feature: {diagnostic_feature}'",
+    "2.6":"''",
+    "3.1":"f'Values tested: {len(tested_values)}\\nUnique values: {tested_values.nunique()}'",
+    "3.2":"f'Shapiro statistic: {shapiro_statistic:.4f}\\nShapiro p-value: {shapiro_p_value:.3e}'",
+    "3.3":"f'Standardised mean: {standardised_values.mean():.4f}\\nStandardised sample SD: {standardised_values.std(ddof=1):.4f}'",
+    "3.4":"f'K–S statistic: {ks_statistic:.4f}\\nK–S p-value: {ks_p_value:.3e}'",
+    "4.1":"f'Values: {len(target_values)}\\nMinimum: {target_values.min():.2f}\\nMaximum: {target_values.max():.2f}'",
+    "4.2":"f'Target skew: {target_skew:.3f}'",
+    "4.3":"''",
+    "4.4":"f'Original first five: {target_values.head().round(2).tolist()}\\nLog first five: {pd.Series(log_target_values).head().round(3).tolist()}'",
+    "4.5":"skew_comparison.round(3).to_string(index=False)",
+    "5.1":"anova_data.groupby('retrofit_programme')[TARGET_COLUMN].agg(['count','mean']).round(2).to_string()",
+    "5.2":"'Group sizes: ' + str(sorted(len(group) for group in programme_groups))",
+    "5.3":"f'F-statistic: {f_statistic:.3f}\\np-value: {p_value:.3e}'",
+    "5.4":"f'Reject H0 at alpha={ALPHA}: {bool(anova_reject_h0)}'"
+  };
+
+  const expectedOutputs = {
+    "1.1":"<code>TARGET_COLUMN</code> should contain <strong>annual_energy_savings</strong>.",
+    "1.2":"<code>model_data</code> should contain <strong>352 rows</strong>, with zero missing target values.",
+    "1.3":"Expected dimensions:<pre>X_raw shape: (352, 11)\ny length: 352</pre>",
+    "1.4":"Expected split sizes:<pre>Training features: (264, 11)\nTest features: (88, 11)</pre>The index sets should not overlap.",
+    "2.1":"<code>numeric_train</code> should have shape <strong>(264, 6)</strong> and contain floor area, building age, occupancy rate, retrofit spend, maintenance cost and prior energy use.",
+    "2.2":"Expected training-data skew values:<pre>maintenance_cost          2.555\nenergy_use_before_kwh     1.922\nfloor_area_sqm            1.782\nretrofit_spend            1.475\nbuilding_age_years        1.315\noccupancy_rate           -0.825</pre>",
+    "2.3":"Expected excess kurtosis values:<pre>maintenance_cost          9.450\nenergy_use_before_kwh     5.805\nfloor_area_sqm            5.311\nbuilding_age_years        2.734\nretrofit_spend            2.718\noccupancy_rate            0.493</pre>",
+    "2.4":"The shortlist should contain:<pre>['floor_area_sqm', 'building_age_years', 'retrofit_spend',\n 'maintenance_cost', 'energy_use_before_kwh']</pre>",
+    "2.5":"<code>diagnostic_feature</code> should be <strong>maintenance_cost</strong> and should appear in <code>priority_features</code>.",
+    "2.6":"A labelled Q–Q plot should appear. The points should curve away from the reference line, especially in the upper tail, providing visual evidence against normality.",
+    "3.1":"<code>tested_values</code> should contain <strong>258</strong> non-missing, varying maintenance-cost values from the training set.",
+    "3.2":"Expected Shapiro–Wilk output:<pre>statistic: 0.7549\np-value: 2.628e-19</pre>The low p-value is evidence against normality, not evidence that the feature is useless.",
+    "3.3":"The standardised Series should have a mean of approximately <strong>0.0000</strong> and a sample standard deviation of <strong>1.0000</strong>.",
+    "3.4":"Expected approximate K–S output:<pre>statistic: 0.1738\np-value: 2.746e-07</pre>Remember that the p-value is approximate because its normal parameters were estimated from the sample.",
+    "4.1":"<code>target_values</code> should contain <strong>264</strong> training values, ranging from approximately <strong>1,953.30</strong> to <strong>37,107.19</strong>.",
+    "4.2":"<code>target_skew</code> should be approximately <strong>1.612</strong>, which meets the working threshold for strong positive skew.",
+    "4.3":"A histogram with mean and median reference lines should appear. Expect a concentrated centre with a <strong>long right tail</strong>.",
+    "4.4":"The first five values should compare as follows:<pre>Original: [3930.32, 7039.29, 8192.30, 6385.68, 3911.43]\nlog1p:    [8.277, 8.859, 9.011, 8.762, 8.272]</pre>",
+    "4.5":"Expected comparison:<pre>target version                     skew  absolute skew\nOriginal energy savings           1.612          1.612\nLog-transformed energy savings    0.054          0.054</pre>The reduction supports testing the transformed target in a model; it does not prove that it will improve unseen-data performance.",
+    "5.1":"The ANOVA data should contain <strong>352 rows</strong>. Programme group means should be approximately:<pre>Advanced   13,207.18\nBasic       6,951.57\nStandard    9,902.80</pre>",
+    "5.2":"The three group arrays should have sizes <strong>71, 133 and 148</strong>.",
+    "5.3":"Expected ANOVA output:<pre>F-statistic: 36.092\np-value: 5.658e-15</pre>",
+    "5.4":"<code>anova_reject_h0</code> should be <strong>True</strong>. This is evidence that at least one programme mean differs, but it does not identify which pairs differ or guarantee predictive improvement."
+  };
+
+  const setupPython = String.raw`
+import io, contextlib, traceback, base64
+import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(52)
+n = 360
+
+building_type = rng.choice(
+    ['Office','Retail','Education','Warehouse'], n,
+    p=[0.32,0.24,0.24,0.20]
+)
+region = rng.choice(['North','South','East','West'],n)
+retrofit_programme = rng.choice(
+    ['Basic','Standard','Advanced'], n,
+    p=[0.35,0.40,0.25]
+)
+floor_area_sqm = rng.lognormal(8.15,0.62,n)
+building_age_years = np.clip(rng.gamma(3.0,8.0,n),1,90)
+occupancy_rate = np.clip(rng.beta(8,2,n)*100,35,100)
+programme_multiplier = pd.Series(retrofit_programme).map(
+    {'Basic':0.72,'Standard':1.0,'Advanced':1.38}
+).to_numpy()
+retrofit_spend = rng.gamma(2.0,33000,n)*programme_multiplier+12000
+maintenance_cost = rng.lognormal(10.65,0.86,n)
+energy_use_before_kwh = rng.lognormal(12.25,0.55,n)*(
+    floor_area_sqm/np.median(floor_area_sqm)
+)**0.25
+green_certified = np.where(rng.random(n)<0.38,'Yes','No')
+
+programme_effect = pd.Series(retrofit_programme).map(
+    {'Basic':0.0,'Standard':0.28,'Advanced':0.56}
+).to_numpy()
+building_effect = pd.Series(building_type).map(
+    {'Office':0.10,'Retail':0.02,'Education':0.08,'Warehouse':-0.05}
+).to_numpy()
+log_target = (
+    8.75 + programme_effect + building_effect
+    + 0.10*np.log(retrofit_spend/50000)
+    + 0.08*np.log(floor_area_sqm/3000)
+    + rng.normal(0,0.48,n)
+)
+annual_energy_savings = np.exp(log_target)
+
+building_data = pd.DataFrame({
+    'building_id':[f'B{i:03d}' for i in range(1,n+1)],
+    'region':region,
+    'building_type':building_type,
+    'retrofit_programme':retrofit_programme,
+    'floor_area_sqm':floor_area_sqm.round(1),
+    'building_age_years':building_age_years.round(1),
+    'occupancy_rate':occupancy_rate.round(1),
+    'retrofit_spend':retrofit_spend.round(2),
+    'maintenance_cost':maintenance_cost.round(2),
+    'energy_use_before_kwh':energy_use_before_kwh.round(1),
+    'green_certified':green_certified,
+    'annual_energy_savings':annual_energy_savings.round(2)
+})
+
+for column in ['occupancy_rate','maintenance_cost','building_type']:
+    missing_index = rng.choice(n,10,replace=False)
+    building_data.loc[missing_index,column] = np.nan
+
+missing_target_index = rng.choice(n,8,replace=False)
+building_data.loc[missing_target_index,'annual_energy_savings'] = np.nan
+
+RANDOM_STATE = 42
+ALPHA = 0.05
+SKEW_THRESHOLD = 1.0
+
+def _run_learner(code):
+    stream = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(stream), contextlib.redirect_stderr(stream):
+            exec(code, globals())
+        return {'ok':True,'output':stream.getvalue(),'error':''}
+    except Exception:
+        return {'ok':False,'output':stream.getvalue(),'error':traceback.format_exc(limit=2)}
+
+def _safe_eval_validator(expression):
+    try:
+        return bool(eval('(' + expression + ')', globals()))
+    except Exception:
+        return False
+
+def _safe_result_preview(expression):
+    try:
+        return str(eval(expression, globals())) if expression else ''
+    except Exception:
+        return ''
+
+def _collect_figures():
+    if 'plt' not in globals():
+        return []
+    images=[]
+    for number in list(plt.get_fignums()):
+        buffer=io.BytesIO()
+        plt.figure(number).savefig(buffer,format='png',dpi=120,bbox_inches='tight')
+        images.append(base64.b64encode(buffer.getvalue()).decode('ascii'))
+    plt.close('all')
+    return images
+
+_PROTECTED_KEYS=set(globals().keys())
+def _reset_learner_state():
+    for key in list(globals().keys()):
+        if key not in _PROTECTED_KEYS and not key.startswith('_'):
+            globals().pop(key,None)
+`;
+
+  let pyodide=null, current=0, completed=steps.map(()=>false), skipped=steps.map(()=>false), running=false;
+  const $=id=>document.getElementById(id);
+  const htmlEscape=value=>String(value).replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  function setStatus(text,state=''){const box=$('runtimeStatus'); box.className='status'+(state?' '+state:''); $('runtimeText').textContent=text;}
+  async function initialise(){
+    try{
+      setStatus('Starting Python…');
+      pyodide=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'});
+      setStatus('Loading the practice dataset…');
+      await pyodide.loadPackage(['numpy','pandas']);
+      await pyodide.runPythonAsync(setupPython);
+      const preview=pyodide.runPython("building_data.head(6).to_html(index=False,classes='dataframe',border=0)");
+      $('datasetPreview').innerHTML=`<div><div class="table-label">Commercial-building retrofit data</div><div class="table-wrap">${preview}</div></div>`;
+      setStatus('Python runtime ready.','ready');
+      render();
+    }catch(error){setStatus('Python could not start: '+error.message,'error'); $('activity').innerHTML='<div class="completion"><h2>Runtime unavailable</h2><p>'+htmlEscape(error.message)+'</p></div>';}
+  }
+  async function ensureDependencies(deps){
+    if(!deps||!deps.length)return;
+    const needsSciPy=deps.includes('scipy')&&!pyodide.globals.has('stats');
+    const needsPlot=deps.includes('matplotlib')&&!pyodide.globals.has('plt');
+    const needsSklearn=deps.includes('sklearn')&&!pyodide.globals.has('train_test_split');
+    if(needsSciPy||needsPlot||needsSklearn){
+      setStatus(needsSklearn?'Loading modelling tools…':needsPlot?'Loading statistical and plotting tools…':'Loading statistical tools…');
+      const packages=[]; if(needsSciPy)packages.push('scipy'); if(needsPlot)packages.push('matplotlib'); if(needsSklearn)packages.push('scikit-learn');
+      await pyodide.loadPackage(packages);
+      if(needsSciPy)await pyodide.runPythonAsync('from scipy import stats');
+      if(needsPlot)await pyodide.runPythonAsync("import matplotlib; matplotlib.use('AGG'); import matplotlib.pyplot as plt");
+      if(needsSklearn)await pyodide.runPythonAsync('from sklearn.model_selection import train_test_split');
+      setStatus('Python runtime ready.','ready');
+    }
+  }
+  function renderNavigation(){
+    const done=completed.filter(Boolean).length; $('overallCount').textContent=`${done}/${steps.length}`; $('progressFill').style.width=`${done/steps.length*100}%`;
+    $('navigation').innerHTML=themes.map(theme=>{
+      const members=steps.map((s,i)=>({s,i})).filter(x=>x.s.theme===theme.id), count=members.filter(x=>completed[x.i]).length;
+      const rows=members.map(({s,i})=>`<div class="step-nav ${skipped[i]?'skipped':completed[i]?'done':i===current?'current':''}">${skipped[i]?'↷':completed[i]?'✓':i===current?'▶':'○'} ${s.id} ${s.title}</div>`).join('');
+      return `<div class="theme-nav"><div class="theme-nav-head"><span>Theme ${theme.id} — ${theme.title}</span><span class="theme-count">${count}/${members.length} complete</span></div>${rows}</div>`;
+    }).join('');
+  }
+  function nextLabel(index){if(index===steps.length-1)return'Finish activity'; return steps[index+1].theme!==steps[index].theme?'Next theme':'Next sub-step';}
+  function render(){
+    renderNavigation();
+    if(current>=steps.length){renderCompletion();return;}
+    const step=steps[current],theme=themes.find(t=>t.id===step.theme);
+    const carryNotice=current>0&&skipped[current-1]?'<div class="feedback warn" style="display:block">↷ The previous answer code was run for you. Its variables and results are available in this sub-step.</div>':'';
+    $('activity').innerHTML=`<div class="theme-banner"><div class="theme-kicker">Theme ${theme.id}</div><h2>${theme.title}</h2><p>${theme.purpose}</p></div><div class="step-body"><div class="step-number">Sub-step ${step.id}</div><h3>${step.title}</h3><div class="instruction">${step.instruction}</div><div class="hint"><strong>Hint</strong>${step.hint}</div>${carryNotice}<textarea id="codeEditor" aria-label="Python code for sub-step ${step.id}" spellcheck="false"></textarea><div class="buttons"><button id="runButton" class="button run">▶ Run step</button><button id="skipButton" class="button skip">↷ Skip and use answer</button><button id="nextButton" class="button next" disabled>${nextLabel(current)} →</button></div><div id="feedback" class="feedback"></div><div class="output-label">Your result</div><div id="output" class="output">Your Python output or result preview will appear here.</div><div id="plots" class="plots"></div><details class="expected"><summary>Expected output — open to compare</summary><div class="expected-content">${expectedOutputs[step.id]}</div></details></div>`;
+    $('runButton').addEventListener('click',runStep); $('skipButton').addEventListener('click',skipStep); $('nextButton').addEventListener('click',()=>{current+=1;render();window.scrollTo({top:$('activity').offsetTop-12,behavior:'smooth'});});
+  }
+  async function runStep(){
+    if(running||!pyodide)return; const code=$('codeEditor').value.trim(),feedback=$('feedback'),output=$('output');
+    if(!code){feedback.className='feedback warn';feedback.textContent='Enter some Python code before running the step.';return;}
+    running=true;$('runButton').disabled=true;$('skipButton').disabled=true;feedback.className='feedback';output.textContent='Running…';$('plots').innerHTML='';
+    try{
+      const step=steps[current]; await ensureDependencies(step.deps);
+      pyodide.globals.set('_learner_code_js',code); const proxy=await pyodide.runPythonAsync('_run_learner(_learner_code_js)'); const result=proxy.toJs({dict_converter:Object.fromEntries}); proxy.destroy();
+      let resultPreview='';
+      if(result.ok&&resultExpressions[step.id]){pyodide.globals.set('_result_expr_js',resultExpressions[step.id]);resultPreview=pyodide.runPython('_safe_result_preview(_result_expr_js)');}
+      output.textContent=result.output||result.error||resultPreview||'(Code ran without printed output. Compare the rendered plot or expected-output panel below.)';
+      if(!result.ok){feedback.className='feedback fail';feedback.textContent='The code could not be completed. Review the Python output and try again.';return;}
+      pyodide.globals.set('_validator_expr_js',step.validator); const valid=pyodide.runPython('_safe_eval_validator(_validator_expr_js)');
+      const figsProxy=pyodide.runPython('_collect_figures()'); const figs=figsProxy.toJs(); figsProxy.destroy();
+      $('plots').innerHTML=Array.from(figs).map((img,i)=>`<img alt="Plot produced for sub-step ${step.id}, figure ${i+1}" src="data:image/png;base64,${img}">`).join('');
+      if(!valid){feedback.className='feedback warn';feedback.textContent='The code ran, but it has not completed this step yet. Review the instruction and hint, then try again.';return;}
+      completed[current]=true;feedback.className='feedback success';feedback.textContent='✅ Step completed';$('codeEditor').disabled=true;$('runButton').disabled=true;$('skipButton').disabled=true;$('nextButton').disabled=false;renderNavigation();
+    }catch(error){output.textContent=error.stack||error.message;feedback.className='feedback fail';feedback.textContent='The code could not be completed. Review the Python output and try again.';}
+    finally{running=false;if(!completed[current]&&$('runButton')){$('runButton').disabled=false;$('skipButton').disabled=false;}}
+  }
+
+  async function skipStep(){
+    if(running||!pyodide)return;
+    const step=steps[current],code=solutionCodes[step.id];
+    if(!window.confirm('Skip this sub-step? The answer code will be revealed and run so later sub-steps can still use its result.'))return;
+    const editor=$('codeEditor'),feedback=$('feedback'),output=$('output');
+    editor.value=code;running=true;$('runButton').disabled=true;$('skipButton').disabled=true;feedback.className='feedback';output.textContent='Running the answer code…';$('plots').innerHTML='';
+    try{
+      await ensureDependencies(step.deps);
+      pyodide.globals.set('_learner_code_js',code);const proxy=await pyodide.runPythonAsync('_run_learner(_learner_code_js)');const result=proxy.toJs({dict_converter:Object.fromEntries});proxy.destroy();
+      if(!result.ok)throw new Error(result.error||'The answer code could not be run.');
+      pyodide.globals.set('_validator_expr_js',step.validator);const valid=pyodide.runPython('_safe_eval_validator(_validator_expr_js)');
+      if(!valid)throw new Error('The stored answer did not pass validation.');
+      let resultPreview='';if(resultExpressions[step.id]){pyodide.globals.set('_result_expr_js',resultExpressions[step.id]);resultPreview=pyodide.runPython('_safe_result_preview(_result_expr_js)');}
+      output.textContent=result.output||resultPreview||'(The answer code ran successfully. See the rendered plot below.)';
+      const figsProxy=pyodide.runPython('_collect_figures()');const figs=figsProxy.toJs();figsProxy.destroy();
+      $('plots').innerHTML=Array.from(figs).map((img,i)=>`<img alt="Plot produced by the answer for sub-step ${step.id}, figure ${i+1}" src="data:image/png;base64,${img}">`).join('');
+      completed[current]=true;skipped[current]=true;editor.disabled=true;$('runButton').disabled=true;$('skipButton').disabled=true;$('nextButton').disabled=false;
+      feedback.className='feedback warn';feedback.textContent='↷ Sub-step skipped. The answer code above has been run and its result will carry forward to the next sub-step.';renderNavigation();
+    }catch(error){output.textContent=error.stack||error.message;feedback.className='feedback fail';feedback.textContent='The stored answer could not be applied. You can try the step again.';}
+    finally{running=false;if(!completed[current]){$('runButton').disabled=false;$('skipButton').disabled=false;}}
+  }
+  function renderCompletion(){
+    $('activity').innerHTML='<div class="completion"><div class="tick">✅</div><h2>Activity complete</h2><p>You created a leakage-safe split, diagnosed distribution shape, combined visual and formal normality evidence, tested a target transformation, and screened a categorical feature with one-way ANOVA.</p><button id="restartButton" class="button next">↻ Restart activity</button></div>';
+    $('restartButton').addEventListener('click',async()=>{await pyodide.runPythonAsync(setupPython);completed=steps.map(()=>false);skipped=steps.map(()=>false);current=0;render();});
+  }
+  renderNavigation(); initialise();
+  </script>
+</body>
+</html>

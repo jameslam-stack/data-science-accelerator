@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time series with pandas roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1f232e;
+      --ink-soft: #2b2c30;
+      --muted: #666666;
+      --background: #ffffff;
+      --header-band: #f5f5f2;
+      --card: #ffffff;
+      --quiet: #fafafa;
+      --yellow: #fef800;
+      --yellow-soft: #fffec2;
+      --line: #d9d9d9;
+      --line-dark: #969696;
+      --radius: 4px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Work Sans", Arial, sans-serif;
+      background-color: var(--background);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Decoded Hero Header Component */
+    .hero-header {
+      background-color: var(--header-band);
+      color: var(--ink);
+      padding: 32px 24px;
+      border-radius: var(--radius);
+      border-bottom: 10px solid var(--yellow);
+      margin-bottom: 24px;
+    }
+
+    .eyebrow-badge {
+      display: inline-block;
+      background-color: var(--yellow);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+    }
+
+    .hero-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .hero-header p {
+      font-size: 15px;
+      color: var(--ink-soft);
+      max-width: 750px;
+    }
+
+    /* Navigation & Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      background-color: var(--header-band);
+      color: var(--ink);
+      font-family: "Work Sans", Arial, sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background-color: var(--yellow-soft);
+    }
+
+    .tab-btn[aria-selected="true"] {
+      background-color: var(--yellow);
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    /* Decoded Callout Box Component */
+    .callout-box {
+      background-color: var(--header-band);
+      border-left: 6px solid var(--yellow);
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+    }
+
+    .callout-box h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background-color: var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--yellow);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Map Dot Markers & Step Cards */
+    .map-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 14px;
+      background-color: var(--header-band);
+      color: var(--ink);
+      border: 1px solid var(--line-dark);
+      flex-shrink: 0;
+    }
+
+    .map-dot.done {
+      background-color: var(--yellow);
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .step-card {
+      background-color: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .step-card.completed {
+      background-color: var(--quiet);
+      border-color: var(--line-dark);
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .step-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .step-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .step-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      background-color: var(--header-band);
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    .checkbox-label:hover {
+      background-color: var(--yellow-soft);
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      accent-color: var(--ink);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Expandable Details Box */
+    details {
+      background-color: var(--header-band);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-top: 12px;
+    }
+
+    summary {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .details-content {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    pre {
+      background-color: var(--ink);
+      color: var(--yellow);
+      padding: 12px;
+      border-radius: var(--radius);
+      font-family: monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-bottom: 8px;
+    }
+
+    /* Filter & Search Bar */
+    .search-bar {
+      width: 100%;
+      padding: 12px 16px;
+      font-family: "Work Sans", Arial, sans-serif;
+      font-size: 14px;
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      background-color: var(--background);
+      margin-bottom: 20px;
+    }
+
+    /* Quiz Card Component */
+    .quiz-card {
+      background-color: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .quiz-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .quiz-option:hover {
+      background-color: var(--yellow-soft);
+    }
+
+    .quiz-option input[type="radio"] {
+      accent-color: var(--ink);
+    }
+
+    .btn-submit {
+      background-color: var(--ink);
+      color: var(--background);
+      font-family: "Work Sans", Arial, sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--ink-soft);
+    }
+
+    .quiz-feedback {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    /* Quick Reference Table */
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-size: 14px;
+    }
+
+    .ref-table th, .ref-table td {
+      padding: 12px;
+      border: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .ref-table th {
+      background-color: var(--header-band);
+      font-weight: 700;
+    }
+
+    .ref-table code {
+      background-color: var(--header-band);
+      padding: 2px 6px;
+      border-radius: var(--radius);
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    /* Accessibility Focus State */
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 860px) {
+      body { padding: 16px; }
+      .hero-header h1 { font-size: 26px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-header { padding: 20px 16px; }
+      .nav-tabs { flex-direction: column; }
+      .step-header { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Decoded Hero Header -->
+    <header class="hero-header">
+      <span class="eyebrow-badge">Decoded learning recap</span>
+      <h1>Time series with pandas roadmap</h1>
+      <p>
+        Welcome to your standalone roadmap recap. Work through each core topic learnt in this module, track your learning progress, inspect code examples, and test your knowledge.
+      </p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button onclick="switchTab('steps')" id="tab-steps" class="tab-btn" role="tab" aria-selected="true" aria-controls="view-steps">
+        Roadmap steps
+      </button>
+      <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn" role="tab" aria-selected="false" aria-controls="view-quiz">
+        Interactive recap quiz
+      </button>
+      <button onclick="switchTab('cheatsheet')" id="tab-cheatsheet" class="tab-btn" role="tab" aria-selected="false" aria-controls="view-cheatsheet">
+        Quick reference table
+      </button>
+    </nav>
+
+    <!-- Decoded Callout Checkpoint: Progress Tracker -->
+    <section class="callout-box">
+      <h2>Learning progress overview</h2>
+      <p id="progress-text" style="font-size: 13px; color: var(--muted);">0 of 6 completed (0%)</p>
+      <div class="progress-bar-container">
+        <div id="progress-bar" class="progress-bar-fill"></div>
+      </div>
+    </section>
+
+    <!-- TAB 1: ROADMAP STEPS -->
+    <main id="view-steps" role="tabpanel">
+      
+      <!-- Filter Search Input -->
+      <input type="text" id="search-input" onkeyup="filterSteps()" placeholder="Search roadmap steps or pandas methods..." class="search-bar">
+
+      <!-- Step 1 -->
+      <article class="step-card" data-keywords="datetime pd.to_datetime convert dates dtypes">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="map-dot" id="dot-1">1</span>
+            <div>
+              <h3>Converting string dates to datetime</h3>
+              <span class="step-subtitle">Step 1 of 6 &bull; Data preparation</span>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" onchange="toggleStep(this, 1)">
+            <span>Mark complete</span>
+          </label>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft);">
+          Time series data requires date strings to be converted into <code>datetime64</code> format using <code>pd.to_datetime()</code>.
+        </p>
+        <details>
+          <summary>
+            <span>Show code example and hint</span>
+            <span>▼</span>
+          </summary>
+          <div class="details-content">
+            <pre># Convert text column to pandas datetime
+auckland['date'] = pd.to_datetime(auckland['Date'])
+auckland.dtypes</pre>
+            <p style="font-size: 13px; color: var(--muted);"><strong>Key take-away:</strong> Always verify that your date column displays <code>datetime64[ns]</code>.</p>
+          </div>
+        </details>
+      </article>
+
+      <!-- Step 2 -->
+      <article class="step-card" data-keywords="set_index sort_index datetime index chronological">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="map-dot" id="dot-2">2</span>
+            <div>
+              <h3>Setting and sorting the datetime index</h3>
+              <span class="step-subtitle">Step 2 of 6 &bull; Indexing</span>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" onchange="toggleStep(this, 2)">
+            <span>Mark complete</span>
+          </label>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft);">
+          Setting the datetime column as your DataFrame index enables date-based slicing. Always sort the index chronologically using <code>.sort_index()</code>.
+        </p>
+        <details>
+          <summary>
+            <span>Show code example and hint</span>
+            <span>▼</span>
+          </summary>
+          <div class="details-content">
+            <pre># Set date column as index and sort chronologically
+auckland = auckland.set_index('date')
+auckland.sort_index(ascending=True, inplace=True)</pre>
+            <p style="font-size: 13px; color: var(--muted);"><strong>Key take-away:</strong> A sorted datetime index is required for date filtering and resampling.</p>
+          </div>
+        </details>
+      </article>
+
+      <!-- Step 3 -->
+      <article class="step-card" data-keywords="slicing subsetting loc year range filter monday">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="map-dot" id="dot-3">3</span>
+            <div>
+              <h3>Slicing and filtering time series data</h3>
+              <span class="step-subtitle">Step 3 of 6 &bull; Selection</span>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" onchange="toggleStep(this, 3)">
+            <span>Mark complete</span>
+          </label>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft);">
+          Filter specific years or date ranges easily using string indexing with <code>.loc[]</code>, or filter days of the week using <code>.index.day_name()</code>.
+        </p>
+        <details>
+          <summary>
+            <span>Show code example and hint</span>
+            <span>▼</span>
+          </summary>
+          <div class="details-content">
+            <pre># Slice single year 2000
+auckland.loc['2000'].plot()
+
+# Slice date range 2000 to 2005
+auckland.loc['2000':'2005'].plot()
+
+# Filter for Mondays
+auckland[auckland.index.day_name() == 'Monday'].plot()</pre>
+            <p style="font-size: 13px; color: var(--muted);"><strong>Key take-away:</strong> String date slicing is intuitive and fast in pandas.</p>
+          </div>
+        </details>
+      </article>
+
+      <!-- Step 4 -->
+      <article class="step-card" data-keywords="outliers missing values isna fillna ffill asfreq">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="map-dot" id="dot-4">4</span>
+            <div>
+              <h3>Handling outliers and missing values</h3>
+              <span class="step-subtitle">Step 4 of 6 &bull; Cleaning</span>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" onchange="toggleStep(this, 4)">
+            <span>Mark complete</span>
+          </label>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft);">
+          Identify outliers using <code>.describe()</code>. Replace erroneous entries with <code>np.nan</code>, enforce explicit dates with <code>.asfreq('D')</code>, and fill gaps with forward fill (<code>.fillna(method='ffill')</code>).
+        </p>
+        <details>
+          <summary>
+            <span>Show code example and hint</span>
+            <span>▼</span>
+          </summary>
+          <div class="details-content">
+            <pre># Enforce daily frequency and forward fill missing values
+auckland = auckland.asfreq('D')
+auckland = auckland.fillna(method='ffill')</pre>
+            <p style="font-size: 13px; color: var(--muted);"><strong>Key take-away:</strong> Always choose an imputation technique suitable for your dataset.</p>
+          </div>
+        </details>
+      </article>
+
+      <!-- Step 5 -->
+      <article class="step-card" data-keywords="resample frequency offset alias downsampling yearly mean">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="map-dot" id="dot-5">5</span>
+            <div>
+              <h3>Resampling and changing data frequency</h3>
+              <span class="step-subtitle">Step 5 of 6 &bull; Resampling</span>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" onchange="toggleStep(this, 5)">
+            <span>Mark complete</span>
+          </label>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft);">
+          Change the frequency of your time series using <code>.resample()</code>. For example, downsample daily data to yearly averages using <code>.resample('Y').mean()</code>.
+        </p>
+        <details>
+          <summary>
+            <span>Show code example and hint</span>
+            <span>▼</span>
+          </summary>
+          <div class="details-content">
+            <pre># Resample daily series into yearly mean values
+yearly_avg = auckland.resample('Y').mean()
+yearly_avg.plot()</pre>
+            <p style="font-size: 13px; color: var(--muted);"><strong>Key take-away:</strong> Resampling requires chaining an aggregation function like <code>.mean()</code>.</p>
+          </div>
+        </details>
+      </article>
+
+      <!-- Step 6 -->
+      <article class="step-card" data-keywords="rolling window moving average smoothing noise signal">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="map-dot" id="dot-6">6</span>
+            <div>
+              <h3>Rolling window averages and smoothing</h3>
+              <span class="step-subtitle">Step 6 of 6 &bull; Smoothing</span>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" onchange="toggleStep(this, 6)">
+            <span>Mark complete</span>
+          </label>
+        </div>
+        <p style="font-size: 14px; color: var(--ink-soft);">
+          Reduce noise and highlight long-term trends by calculating moving window averages using <code>.rolling(window=N).mean()</code>.
+        </p>
+        <details>
+          <summary>
+            <span>Show code example and hint</span>
+            <span>▼</span>
+          </summary>
+          <div class="details-content">
+            <pre># Apply 365-day rolling average to smooth daily noise
+auckland.rolling(window=365).mean().plot()</pre>
+            <p style="font-size: 13px; color: var(--muted);"><strong>Key take-away:</strong> Rolling averages maintain original data resolution while smoothing short-term noise.</p>
+          </div>
+        </details>
+      </article>
+
+    </main>
+
+    <!-- TAB 2: INTERACTIVE RECAP QUIZ -->
+    <section id="view-quiz" style="display: none;" role="tabpanel">
+      
+      <div class="callout-box">
+        <h2>Interactive recap quiz</h2>
+        <p style="font-size: 13px; color: var(--muted);">Check your understanding of the concepts covered in this module.</p>
+      </div>
+
+      <!-- Question 1 -->
+      <div class="quiz-card" data-correct="1">
+        <h3>1. Which function converts string date columns into datetime objects in pandas?</h3>
+        <label class="quiz-option">
+          <input type="radio" name="q1" value="0">
+          <span><code>pd.to_date()</code></span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="q1" value="1">
+          <span><code>pd.to_datetime()</code></span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="q1" value="2">
+          <span><code>pd.make_datetime()</code></span>
+        </label>
+        <button onclick="checkQuizQuestion(this)" class="btn-submit">Check answer</button>
+        <p class="quiz-feedback" style="display: none;"></p>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="quiz-card" data-correct="2">
+        <h3>2. What is the benefit of setting a datetime index in pandas?</h3>
+        <label class="quiz-option">
+          <input type="radio" name="q2" value="0">
+          <span>It automatically removes outliers from your dataset.</span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="q2" value="1">
+          <span>It converts all numerical values into integers.</span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="q2" value="2">
+          <span>It enables string date slicing (e.g. <code>.loc['2000']</code>) and resampling.</span>
+        </label>
+        <button onclick="checkQuizQuestion(this)" class="btn-submit">Check answer</button>
+        <p class="quiz-feedback" style="display: none;"></p>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="quiz-card" data-correct="0">
+        <h3>3. Which method smooths short-term fluctuations by computing moving window averages?</h3>
+        <label class="quiz-option">
+          <input type="radio" name="q3" value="0">
+          <span><code>.rolling(window=N).mean()</code></span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="q3" value="1">
+          <span><code>.drop_duplicates()</code></span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="q3" value="2">
+          <span><code>.sort_values()</code></span>
+        </label>
+        <button onclick="checkQuizQuestion(this)" class="btn-submit">Check answer</button>
+        <p class="quiz-feedback" style="display: none;"></p>
+      </div>
+
+    </section>
+
+    <!-- TAB 3: CHEAT SHEET -->
+    <section id="view-cheatsheet" style="display: none;" role="tabpanel">
+      <div class="callout-box">
+        <h2>Quick reference table</h2>
+        <p style="font-size: 13px; color: var(--muted);">Essential pandas functions for time series analysis.</p>
+      </div>
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th>Function / Method</th>
+            <th>Description</th>
+            <th>Example code</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>pd.to_datetime()</code></td>
+            <td>Converts string date columns to datetime objects.</td>
+            <td><code>df['date'] = pd.to_datetime(df['Date'])</code></td>
+          </tr>
+          <tr>
+            <td><code>.set_index()</code></td>
+            <td>Sets datetime column as DataFrame row index.</td>
+            <td><code>df = df.set_index('date')</code></td>
+          </tr>
+          <tr>
+            <td><code>.sort_index()</code></td>
+            <td>Sorts rows chronologically by date index.</td>
+            <td><code>df.sort_index(ascending=True)</code></td>
+          </tr>
+          <tr>
+            <td><code>.loc['YYYY']</code></td>
+            <td>Slices rows for specific years or date ranges.</td>
+            <td><code>df.loc['2000':'2005']</code></td>
+          </tr>
+          <tr>
+            <td><code>.asfreq('D')</code></td>
+            <td>Enforces explicit date frequency on index.</td>
+            <td><code>df = df.asfreq('D')</code></td>
+          </tr>
+          <tr>
+            <td><code>.resample('Y')</code></td>
+            <td>Changes time series frequency with aggregation.</td>
+            <td><code>df.resample('Y').mean()</code></td>
+          </tr>
+          <tr>
+            <td><code>.rolling(N)</code></td>
+            <td>Calculates moving window averages.</td>
+            <td><code>df.rolling(window=365).mean()</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <script>
+    // Tab Switching Logic
+    function switchTab(tabName) {
+      const views = ['steps', 'quiz', 'cheatsheet'];
+      views.forEach(v => {
+        document.getElementById('view-' + v).style.display = 'none';
+        const tabBtn = document.getElementById('tab-' + v);
+        tabBtn.setAttribute('aria-selected', 'false');
+      });
+      document.getElementById('view-' + tabName).style.display = 'block';
+      const activeBtn = document.getElementById('tab-' + tabName);
+      activeBtn.setAttribute('aria-selected', 'true');
+    }
+
+    // Progress Tracker Logic
+    function toggleStep(checkbox, stepNum) {
+      const dot = document.getElementById('dot-' + stepNum);
+      const card = checkbox.closest('.step-card');
+      
+      if (checkbox.checked) {
+        dot.classList.add('done');
+        card.classList.add('completed');
+      } else {
+        dot.classList.remove('done');
+        card.classList.remove('completed');
+      }
+
+      const checkboxes = document.querySelectorAll('.step-card input[type="checkbox"]');
+      const total = checkboxes.length;
+      let completed = 0;
+      checkboxes.forEach(cb => { if (cb.checked) completed++; });
+
+      const percent = Math.round((completed / total) * 100);
+      document.getElementById('progress-bar').style.width = percent + '%';
+      document.getElementById('progress-text').innerText = `${completed} of ${total} completed (${percent}%)`;
+    }
+
+    // Search Filter Logic
+    function filterSteps() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const cards = document.querySelectorAll('.step-card');
+      cards.forEach(card => {
+        const keywords = card.getAttribute('data-keywords').toLowerCase();
+        const text = card.innerText.toLowerCase();
+        if (keywords.includes(query) || text.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Quiz Evaluation Logic
+    function checkQuizQuestion(button) {
+      const container = button.closest('.quiz-card');
+      const correctIdx = container.getAttribute('data-correct');
+      const selected = container.querySelector('input[type="radio"]:checked');
+      const feedback = container.querySelector('.quiz-feedback');
+      feedback.style.display = 'block';
+
+      if (!selected) {
+        feedback.innerText = "Please select an answer first.";
+        feedback.style.color = "var(--ink)";
+        return;
+      }
+
+      if (selected.value === correctIdx) {
+        feedback.innerText = "Well done! That is correct.";
+        feedback.style.color = "#008000";
+      } else {
+        feedback.innerText = "Incorrect. Try again!";
+        feedback.style.color = "#cc0000";
+      }
+    }
+  </script>
+</body>
+</html>

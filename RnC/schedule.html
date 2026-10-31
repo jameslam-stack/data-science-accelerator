@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f9;
+    padding: 20px;
+    color: #2d3748;
+  }
+
+  .roadmap-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-top: 5px solid #3182ce;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .card.milestone {
+    border-top-color: #dd6b20;
+    background: #fffaf0;
+  }
+
+  .card.graduation {
+    border-top-color: #38a169;
+    background: #f0fff4;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .week-badge {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #4a5568;
+    background: #edf2f7;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .date-badge {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #718096;
+  }
+
+  .theme-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: #1a202c;
+  }
+
+  .topic-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .topic-list li {
+    font-size: 0.92rem;
+    padding: 4px 0;
+    color: #4a5568;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .topic-list li::before {
+    content: "•";
+    color: #3182ce;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="roadmap-container">
+
+  <!-- Week 1 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 1</span>
+        <span class="date-badge">📅 23/07</span>
+      </div>
+      <h3 class="theme-title">🚀 Foundations</h3>
+      <ul class="topic-list">
+        <li>Launch & Welcome</li>
+        <li>Tech Demos</li>
+        <li>Core Foundations</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 2 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 2</span>
+        <span class="date-badge">📅 30/07</span>
+      </div>
+      <h3 class="theme-title">🐍 Python Data Analysis</h3>
+      <ul class="topic-list">
+        <li>Intro to Python</li>
+        <li>Data Manipulation with Pandas</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 3 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 3</span>
+        <span class="date-badge">📅 06/08</span>
+      </div>
+      <h3 class="theme-title">🔍 Exploratory Data Analysis</h3>
+      <ul class="topic-list">
+        <li>Data Cleaning</li>
+        <li>Data Visualisation</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 4 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 4</span>
+        <span class="date-badge">📅 20/08</span>
+      </div>
+      <h3 class="theme-title">📊 Statistical Data Analysis</h3>
+      <ul class="topic-list">
+        <li>Basic Preprocessing for Data Science</li>
+        <li>Introduction to Statistics</li>
+        <li>Hypotheses & Inference</li>
+        <li>Feature Selection</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 5 -->
+  <div class="card milestone">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 5</span>
+        <span class="date-badge">📅 03/09</span>
+      </div>
+      <h3 class="theme-title">💡 Capstone Intro</h3>
+      <ul class="topic-list">
+        <li>Capstone Ideas & Brainstorming</li>
+        <li>Initial Steps</li>
+        <li>Version Control & Dependency Management</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 6 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 6</span>
+        <span class="date-badge">📅 10/09</span>
+      </div>
+      <h3 class="theme-title">🤖 Machine Learning</h3>
+      <ul class="topic-list">
+        <li>ML Foundations</li>
+        <li>Intro to Regression</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 7 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 7</span>
+        <span class="date-badge">📅 17/09</span>
+      </div>
+      <h3 class="theme-title">🎯 Classification</h3>
+      <ul class="topic-list">
+        <li>Intro to Classification</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 8 -->
+  <div class="card">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 8</span>
+        <span class="date-badge">📅 24/09</span>
+      </div>
+      <h3 class="theme-title">📈 Time Series Analysis</h3>
+      <ul class="topic-list">
+        <li>Time Series with Pandas</li>
+        <li>Time Series Analysis Techniques</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Week 9 -->
+  <div class="card milestone">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Week 9</span>
+        <span class="date-badge">📅 01/10</span>
+      </div>
+      <h3 class="theme-title">🛠️ Capstone Project</h3>
+      <ul class="topic-list">
+        <li>Hands-on ML Project Development</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Graduation -->
+  <div class="card graduation">
+    <div>
+      <div class="card-header">
+        <span class="week-badge">Finale</span>
+        <span class="date-badge">📅 TBC</span>
+      </div>
+      <h3 class="theme-title">🎓 Graduation</h3>
+      <ul class="topic-list">
+        <li>Celebrate Achievements 🎉</li>
+        <li>Present Projects 🎤</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

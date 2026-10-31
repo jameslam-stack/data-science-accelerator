@@ -1,0 +1,26 @@
+<pre>============================================================
+DATA SCIENCE PIPELINE REPORT
+============================================================
+Original: (200, 5)
+Final: (200, 8)
+Backend: pandas
+Cleaned: 0
+Created: 4
+Selected: 7
+Transformed: 7
+Accuracy: 0.55
+
+  - [2026-10-28 14:18:51] Loaded: 200x5 from /tmp/real.csv
+  - [2026-10-28 14:18:51] One-hot encoded 'department' -> 4 columns
+  - [2026-10-28 14:18:51] Ordinal encoded 'seniority' -> 3 levels
+  - [2026-10-28 14:18:51] Created polynomial: age_sq
+  - [2026-10-28 14:18:51] Created polynomial: salary_sq
+  - [2026-10-28 14:18:51] Created polynomial: seniority_sq
+  - [2026-10-28 14:18:51] Created interaction term
+  - [2026-10-28 14:18:51] StandardScaler applied
+  - [2026-10-28 14:18:51] SelectKBest selected 7 (k=7)
+  - [2026-10-28 14:18:51] Advanced encoding: placeholder (install feature-engine for target encoding)
+  - [2026-10-28 14:18:51] Accuracy with engineered features: 0.550
+  - [2026-10-28 14:18:51] Preprocess: 7 features ready for modelling
+  - [2026-10-28 14:18:51] Model built — Accuracy: 0.550
+============================================================</pre>

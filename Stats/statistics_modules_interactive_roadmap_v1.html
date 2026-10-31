@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Statistics for Machine Learning — Interactive Roadmap</title>
+  <style>
+    :root {
+      --ink: #1f232e;
+      --ink-soft: #2b2c30;
+      --muted: #666666;
+      --paper: #f2f1ef;
+      --card: #ffffff;
+      --yellow: #fef800;
+      --yellow-soft: #fffec2;
+      --pink: #f93a8e;
+      --pink-dark: #b91f60;
+      --pink-soft: #fde3ee;
+      --blue: #348dcc;
+      --blue-dark: #236693;
+      --blue-soft: #e7f2fa;
+      --line: #d9d9d9;
+      --shadow: 0 18px 48px rgba(31, 35, 46, .10);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(249,58,142,.10), transparent 30rem),
+        radial-gradient(circle at 100% 18%, rgba(52,141,204,.12), transparent 30rem),
+        var(--paper);
+      font-family: "Work Sans", Arial, sans-serif;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+    h1, h2, h3, h4, strong, b, button { font-weight: 600; }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 30px 0 60px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 5vw, 58px);
+      color: white;
+      border-radius: 32px;
+      background: var(--ink);
+      box-shadow: var(--shadow);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 150px; height: 150px;
+      right: 145px; bottom: -92px;
+      border-radius: 28px;
+      background: var(--blue);
+      transform: rotate(15deg);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 330px; height: 330px;
+      right: -110px; top: -150px;
+      border: 52px solid var(--pink);
+      border-radius: 50%;
+      opacity: .92;
+    }
+    .eyebrow { margin: 0 0 12px; color: var(--yellow); font-size: .78rem; font-weight: 600; letter-spacing: .1em; }
+    h1 { position: relative; z-index: 1; max-width: 800px; margin: 0; font-size: clamp(2.1rem, 5vw, 4.9rem); line-height: .98; letter-spacing: -.045em; }
+    .hero-copy { position: relative; z-index: 1; max-width: 720px; margin: 22px 0 0; color: #eeeeee; font-size: clamp(1rem, 1.8vw, 1.2rem); }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .hero-tag { position: relative; z-index: 1; padding: 8px 12px; border: 1px solid #595959; border-radius: 999px; color: #eeeeee; font-size: .84rem; }
+    .controls {
+      position: sticky; top: 12px; z-index: 20;
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px;
+      margin: 22px 0; padding: 12px;
+      border: 1px solid rgba(217,217,217,.92); border-radius: 18px;
+      background: rgba(255,255,255,.88); backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(31,35,46,.08);
+    }
+    .tabs { display: flex; gap: 7px; }
+    .tab { padding: 11px 15px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font-weight: 600; }
+    .tab.active { color: white; background: var(--ink); }
+    .progress-wrap { min-width: 0; }
+    .progress-meta { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; color: var(--muted); font-size: .78rem; font-weight: 600; }
+    .progress-track { height: 8px; overflow: hidden; border-radius: 99px; background: #e6e6e6; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--pink)); transition: width .25s ease; }
+    .reset { border: 0; background: transparent; color: var(--muted); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; }
+    .session-intro {
+      display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px;
+      margin: 24px 0;
+    }
+    .intro-card { padding: 25px; border-radius: var(--radius); background: var(--card); box-shadow: 0 10px 28px rgba(31,35,46,.06); }
+    .intro-card.accent { background: var(--yellow); }
+    .kicker { margin: 0 0 7px; color: var(--pink-dark); font-size: .76rem; font-weight: 600; letter-spacing: .08em; }
+    h2 { margin: 0 0 9px; font-size: clamp(1.55rem, 3vw, 2.35rem); line-height: 1.08; letter-spacing: -.035em; }
+    .intro-card p { margin: 7px 0; }
+    .bridge { padding: 14px 16px; border-left: 4px solid var(--pink); border-radius: 0 12px 12px 0; background: var(--pink-soft); font-size: .91rem; }
+    .layout { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 24px; align-items: start; }
+    .map {
+      position: sticky; top: 100px;
+      max-height: calc(100vh - 120px); overflow: auto;
+      padding: 18px; border-radius: var(--radius); background: var(--card); box-shadow: 0 10px 28px rgba(31,35,46,.06);
+    }
+    .map-title { margin: 0 0 14px; font-size: .78rem; font-weight: 600; letter-spacing: .08em; }
+    .map-list { position: relative; display: grid; gap: 8px; }
+    .map-list::before { content: ""; position: absolute; left: 17px; top: 17px; bottom: 17px; width: 2px; background: var(--line); }
+    .map-item { position: relative; display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 8px; width: 100%; padding: 7px 8px; border: 0; border-radius: 12px; color: var(--muted); background: transparent; text-align: left; }
+    .map-item:hover, .map-item.current { background: var(--blue-soft); color: var(--ink); }
+    .map-dot { z-index: 1; display: grid; place-items: center; width: 34px; height: 34px; border: 2px solid var(--line); border-radius: 50%; background: white; font-size: .75rem; font-weight: 600; }
+    .map-item.done .map-dot { border-color: var(--ink); color: white; background: var(--ink); }
+    .map-item.skipped .map-dot { border-color: var(--yellow); background: var(--yellow-soft); }
+    .map-label { font-size: .78rem; font-weight: 600; line-height: 1.2; }
+    .roadmap { display: grid; gap: 16px; }
+    .step {
+      overflow: hidden;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--card); box-shadow: 0 10px 28px rgba(31,35,46,.055);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .step.current { border-color: rgba(52,141,204,.7); box-shadow: 0 18px 48px rgba(52,141,204,.14); }
+    .step.done { border-color: rgba(31,35,46,.28); }
+    .step-head { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; width: 100%; padding: 21px; border: 0; color: inherit; background: transparent; text-align: left; }
+    .step-number { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 15px; color: white; background: var(--pink); font-weight: 600; }
+    .step.done .step-number { background: var(--ink); }
+    .step.skipped .step-number { color: var(--ink); background: var(--yellow); }
+    .step-title { margin: 0; font-size: 1.08rem; line-height: 1.22; }
+    .step-meta { margin-top: 3px; color: var(--muted); font-size: .78rem; }
+    .chevron { color: var(--muted); font-size: 1.3rem; transition: transform .18s ease; }
+    .step.open .chevron { transform: rotate(180deg); }
+    .step-body { display: none; padding: 0 21px 21px 85px; }
+    .step.open .step-body { display: block; }
+    .why { margin: 0 0 18px; padding: 16px 18px; border-radius: 16px; background: var(--blue-soft); }
+    .why strong { display: block; margin-bottom: 3px; color: var(--blue-dark); font-size: .8rem; letter-spacing: .06em; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .detail { padding: 16px; border: 1px solid var(--line); border-radius: 16px; }
+    .detail h4 { margin: 0 0 7px; font-size: .78rem; letter-spacing: .05em; }
+    .detail p { margin: 0; color: #434343; font-size: .9rem; }
+    .checkpoint { margin-top: 14px; padding: 15px 17px; border-radius: 16px; background: var(--yellow-soft); }
+    .checkpoint b { color: var(--ink); }
+    details.code { margin-top: 14px; border-radius: 14px; background: var(--ink); color: #f4f4f7; }
+    details.code summary { padding: 13px 16px; color: var(--yellow); font-size: .84rem; font-weight: 600; cursor: pointer; }
+    pre { margin: 0; padding: 0 16px 16px; overflow: auto; color: #f7f7fa; white-space: pre-wrap; font: .82rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note-label { display: block; margin: 16px 0 6px; color: var(--muted); font-size: .78rem; font-weight: 600; }
+    textarea { width: 100%; min-height: 76px; resize: vertical; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: #fcfcfd; }
+    textarea:focus { outline: 3px solid rgba(52,141,204,.18); border-color: var(--blue); }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .btn { padding: 10px 14px; border: 0; border-radius: 11px; font-weight: 600; }
+    .btn.primary { color: white; background: var(--ink); }
+    .btn.secondary { color: var(--ink); background: var(--blue-soft); }
+    .btn.skip { color: var(--ink); background: var(--yellow-soft); }
+    .completion {
+      display: none; margin-top: 18px; padding: 24px; border-radius: var(--radius);
+      color: white; background: linear-gradient(125deg, var(--ink), var(--blue-dark));
+    }
+    .completion.show { display: block; }
+    .completion h3 { margin: 0 0 7px; font-size: 1.55rem; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; color: var(--muted); font-size: .78rem; }
+    .legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: var(--line); }
+    .legend .l-done::before { background: var(--ink); }
+    .legend .l-skip::before { background: var(--yellow); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 860px) {
+      .controls { grid-template-columns: 1fr auto; }
+      .progress-wrap { grid-column: 1 / -1; grid-row: 2; }
+      .session-intro, .layout { grid-template-columns: 1fr; }
+      .map { position: static; max-height: none; }
+      .map-list { display: flex; overflow-x: auto; padding-bottom: 5px; }
+      .map-list::before, .map-label { display: none; }
+      .map-item { min-width: 50px; grid-template-columns: 34px; }
+      .step-body { padding-left: 21px; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 18px, 1220px); padding-top: 9px; }
+      .hero { border-radius: 22px; }
+      .tabs { width: 100%; }
+      .tab { flex: 1; padding: 10px 8px; font-size: .8rem; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .step-head { gap: 11px; padding: 16px; }
+      .step-number { width: 42px; height: 42px; }
+    }
+    @media print {
+      body { background: white; }
+      .controls, .map, .actions, textarea { display: none !important; }
+      .shell { width: 100%; }
+      .hero { box-shadow: none; }
+      .layout { display: block; }
+      .step { break-inside: avoid; box-shadow: none; }
+      .step-body { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">Decoded · learner pathway</p>
+      <h1>Statistics for machine learning</h1>
+      <p class="hero-copy">A two-session interactive roadmap that follows the notebooks in order—and makes the purpose of every decision visible.</p>
+      <div class="hero-tags" aria-label="Roadmap features">
+        <span class="hero-tag">Notebook-aligned</span><span class="hero-tag">Why it matters</span><span class="hero-tag">Reflection notes</span><span class="hero-tag">Progress saved</span>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="Roadmap controls">
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-m41" role="tab" aria-selected="true" data-session="m41">M4.1 · Session 1</button>
+        <button class="tab" id="tab-m42" role="tab" aria-selected="false" data-session="m42">M4.2 · Session 2</button>
+      </div>
+      <div class="progress-wrap" aria-live="polite">
+        <div class="progress-meta"><span id="progress-label">0 of 5 themes complete</span><span id="progress-percent">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <button class="reset" id="reset-button">Reset session</button>
+    </section>
+
+    <section class="session-intro" id="session-intro"></section>
+
+    <div class="layout">
+      <aside class="map" aria-label="Session roadmap">
+        <p class="map-title">Your five themes</p>
+        <nav class="map-list" id="map-list"></nav>
+        <div class="legend"><span class="l-done">Complete</span><span class="l-skip">Skipped</span></div>
+      </aside>
+      <section>
+        <div class="roadmap" id="roadmap"></div>
+        <div class="completion" id="completion">
+          <h3>Session complete</h3>
+          <p id="completion-copy"></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const sessions = {
+      m41: {
+        short: 'M4.1', title: 'Session 1 · Statistical reasoning',
+        copy: 'Move from a prepared university dataset to defensible statistical conclusions. The route develops notation, probability, hypothesis tests, correlation and subgroup reasoning before saving the data for Session 2.',
+        outcome: 'By the end, you can explain what the evidence says, what it does not say, and why that distinction matters before modelling.',
+        bridge: '<b>Data hand-off:</b> this session builds the <code>universities</code> dataframe and saves <code>universities_cleaned.csv</code>. That exact file is loaded at the start of M4.2.',
+        complete: 'You have completed all five themes, built the statistical reasoning layer and prepared the session hand-off.',
+        steps: [
+          ['Theme 1 · Prepare a trustworthy analytical dataset','Cells 3–16','Set up the environment, load and inspect both files, standardise column names, join the lookup information and derive comparable rates and groups.','Every later statistic inherits the assumptions made during preparation. Learners need to understand the unit of observation, join key, missing matches and the trade-off between raw counts, rates and grouped categories.','Confirm the unit of observation in both files, check the join result and inspect every derived field before analysis.','Which preparation choice could most change the statistical story later?','import pandas as pd\n\nmain_df = pd.read_csv("your_main_file.csv")\nlookup_df = pd.read_csv("your_lookup_file.csv")\n\ndf = main_df.merge(lookup_df, on="your_join_key", how="your_join_type")\ndf["your_rate"] = df["your_numerator"] / df["your_denominator"]'],
+          ['Theme 2 · Describe distributions and estimate probability','Cells 17–29','Translate notation into Python, calculate probability and conditional probability, summarise centre and spread, then inspect distribution shape visually.','This theme moves learners beyond a single average. It connects mathematical notation to code and shows how proportions, spread, skew, tails and histograms reveal different parts of the same evidence.','Compare mean with median, interpret a binary-event mean as a proportion and describe the histogram before naming the distribution.','What important information would be hidden if you reported only the mean?','values = df["your_numeric_column"]\nsummary = values.agg(["mean", "median", "std", "skew", "kurtosis"])\n\nprobability = df["your_binary_event_column"].mean()\nconditional_probability = df.loc[\n    df["your_group_column"] == "your_group_value",\n    "your_binary_event_column"\n].mean()\n\nvalues.hist(bins=your_bin_count)'],
+          ['Theme 3 · Test differences and associations','Cells 30–42','Frame null and alternative hypotheses, compare two numerical group means with Welch’s t-test, test two categorical variables with chi-square and interpret p-values cautiously.','The test must match the question and variable types. Explicit hypotheses stop the p-value becoming a detached pass/fail number, while cautious interpretation keeps association separate from causal proof.','Record the question, H0, test statistic, p-value, decision and one limitation for each test.','Why can a visible difference between samples still be compatible with chance variation?','group_a = df.loc[df["your_group_column"] == "group_a", "your_numeric_column"]\ngroup_b = df.loc[df["your_group_column"] == "group_b", "your_numeric_column"]\n\nt_statistic, t_p_value = stats.ttest_ind(group_a, group_b, equal_var=False)\n\ntable = pd.crosstab(df["your_category_a"], df["your_category_b"])\nchi_statistic, chi_p_value, _, _ = stats.chi2_contingency(table)'],
+          ['Theme 4 · Investigate relationships and subgroup effects','Cells 43–50','Measure correlation, visualise a numerical relationship, challenge causal claims and compare aggregate patterns with subgroup patterns.','Relationships can be useful for prediction without proving intervention effects. Group composition can also create or reverse an aggregate pattern, so subgroup checks protect against misleading averages and Simpson’s paradox.','Identify the strongest relationships, list plausible confounders and compare the direction of aggregate and subgroup results.','What hidden grouping variable could change the conclusion you first reached?','correlations = df[["your_numeric_column_1", "your_numeric_column_2"]].corr()\n\nplt.scatter(df["your_x_column"], df["your_y_column"])\n\noverall = df.groupby("your_group_column")["your_value_column"].mean()\nsubgroups = df.groupby(["your_group_column", "your_subgroup_column"])["your_value_column"].mean()'],
+          ['Theme 5 · Communicate the evidence and hand off the data','Cells 51–56','Write an evidence-led recommendation containing statistical evidence and limitations, then save the processed dataset for the next notebook.','The outcome is not a collection of outputs. It is a defensible recommendation that distinguishes evidence from uncertainty and preserves a clear, reproducible data hand-off for the next session.','Include a measure, probability, test result, causation warning and subgroup warning; document the saved data assumptions.','Which conclusion is actionable now, and which one requires more evidence?','# Write your evidence-led recommendation in a Markdown cell.\n\n# When ready, save your processed dataframe.\ndf.to_csv("your_output_file.csv", index=False)']
+        ]
+      },
+      m42: {
+        short: 'M4.2', title: 'Session 2 · Statistics for feature selection',
+        copy: 'Continue the university case study by using distribution diagnostics, transformation evidence and ANOVA to support modelling decisions. The emphasis is on choosing the right evidence for the right question.',
+        outcome: 'By the end, you can distinguish “What shape is this variable?” from “Does this feature help explain the target?” and from “Does the complete workflow generalise?”',
+        bridge: '<b>Starting dataframe:</b> M4.2 loads <code>universities_cleaned.csv</code>, then creates <code>model_data</code>, <code>X_train_raw</code>, <code>X_test_raw</code>, <code>y_train</code> and <code>y_test</code>. All decisions are learned from training data only.',
+        complete: 'You have completed all five themes and connected distribution evidence, transformation testing and feature relevance.',
+        steps: [
+          ['Theme 1 · Frame a leakage-safe modelling question','Cells 1–16','Separate distribution shape, normality, relevance and generalisation questions; load the processed data, define a numerical target and create training and test sets.','The target determines the task and every relevance test that follows. Keeping the test data unseen prevents transformation and feature-selection decisions from producing an over-optimistic final score.','Confirm the target type, remove unusable target rows and check the training/test shapes.','Which decisions belong to training data, and which question requires unseen data?','from sklearn.model_selection import train_test_split\n\ndf = pd.read_csv("your_processed_file.csv")\ntarget_column = "your_target_column"\n\nX = df.drop(columns=[target_column])\ny = df[target_column]\n\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=your_test_size, random_state=your_random_state\n)'],
+          ['Theme 2 · Inspect distribution shape visually and numerically','Cells 17–29','Use skew, excess kurtosis and Q–Q plots to investigate numerical training features.','Skew and kurtosis prioritise variables for investigation, while Q–Q plots show whether departures occur in the centre, tails or both. None of these tools measures predictive usefulness.','Describe the shape first, then identify which features deserve further investigation.','What is the risk of treating a skew threshold as an automatic feature-removal rule?','feature_values = X_train["your_numeric_feature"].dropna()\n\nfeature_skew = feature_values.skew()\nfeature_kurtosis = feature_values.kurt()\n\nstats.probplot(feature_values, dist="norm", plot=plt)'],
+          ['Theme 3 · Combine formal normality diagnostics','Cells 30–47','Check the data requirements, run Shapiro–Wilk and an approximate K–S diagnostic, then combine the results with the visual and shape evidence.','Formal tests are sensitive to sample size. A low p-value can flag a minor deviation in a large sample, while a high p-value does not prove normality. The K–S result also needs a parameter-estimation caution.','Interpret each p-value as evidence, not proof, and write one combined decision about what to test next.','When might a clear Q–Q departure matter more than a mechanical p-value decision?','values = X_train["your_numeric_feature"].dropna()\ntested_values = values.sample(your_sample_size, random_state=your_random_state)\n\nshapiro_statistic, shapiro_p_value = stats.shapiro(tested_values)\n\nstandardised_values = (tested_values - tested_values.mean()) / tested_values.std()\nks_statistic, ks_p_value = stats.kstest(standardised_values, "norm")'],
+          ['Theme 4 · Test a more useful target representation','Cells 48–62','Inspect training-target skew and its histogram, check whether a log transformation is valid, then compare the original and transformed distributions.','A right-skewed numerical target can make regression focus on unusually large outcomes. A transformation may help, but reduced skew alone is not enough: residuals, predictive metrics and interpretability must also improve.','Compare mean with median and absolute skew before and after transformation without using test-target values.','What evidence from the complete model would justify keeping the transformation?','target_values = pd.to_numeric(y_train, errors="coerce").dropna()\noriginal_skew = target_values.skew()\n\ntransformed_values = np.log1p(target_values)\ntransformed_skew = transformed_values.skew()\n\ncomparison = pd.DataFrame({\n    "version": ["original", "transformed"],\n    "skew": [original_skew, transformed_skew]\n})'],
+          ['Theme 5 · Assess feature relevance and make a recommendation','Cells 63–77','Use one-way ANOVA to compare target means across categories, interpret the result cautiously and connect relevance evidence with domain knowledge and unseen-data performance.','ANOVA can show that at least one group mean differs, but it does not identify the groups, prove causation, measure practical importance or guarantee a better model. The final choice must evaluate the whole workflow.','State H0, interpret the p-value, name a limitation and recommend a validation or effect-size check.','Why are “non-normal”, “statistically significant” and “predictively useful” three different conclusions?','analysis_df = df[["your_group_column", "your_numeric_target"]].dropna()\n\ngroups = [\n    group["your_numeric_target"].values\n    for _, group in analysis_df.groupby("your_group_column")\n]\n\nf_statistic, p_value = stats.f_oneway(*groups)\n\n# Write a cautious recommendation and propose the next validation step.']
+        ]
+      }
+    };
+
+    let activeSession = localStorage.getItem('stats-roadmap-active') || 'm41';
+    let openStep = 0;
+
+    function key(type) { return `stats-roadmap-themes-v2-${activeSession}-${type}`; }
+    function readObject(type) {
+      try { return JSON.parse(localStorage.getItem(key(type)) || '{}'); }
+      catch { return {}; }
+    }
+    function writeObject(type, value) { localStorage.setItem(key(type), JSON.stringify(value)); }
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+    }
+
+    function render() {
+      const session = sessions[activeSession];
+      const status = readObject('status');
+      const notes = readObject('notes');
+      document.querySelectorAll('.tab').forEach(tab => {
+        const active = tab.dataset.session === activeSession;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+      document.getElementById('session-intro').innerHTML = `
+        <article class="intro-card"><p class="kicker">${session.short}</p><h2>${session.title}</h2><p>${session.copy}</p><div class="bridge">${session.bridge}</div></article>
+        <aside class="intro-card accent"><p class="kicker">Destination</p><h2>What you will be able to do</h2><p>${session.outcome}</p></aside>`;
+
+      document.getElementById('map-list').innerHTML = session.steps.map((step, i) => `
+        <button class="map-item ${status[i] || ''} ${i === openStep ? 'current' : ''}" data-jump="${i}" aria-label="Go to theme ${i+1}: ${escapeHtml(step[0])}">
+          <span class="map-dot">${status[i] === 'done' ? '✓' : status[i] === 'skipped' ? '↷' : i+1}</span><span class="map-label">${step[0]}</span>
+        </button>`).join('');
+
+      document.getElementById('roadmap').innerHTML = session.steps.map((step, i) => {
+        const [title, cells, action, why, evidence, prompt, code] = step;
+        const state = status[i] || '';
+        return `<article class="step ${state} ${i === openStep ? 'open current' : ''}" id="step-${i}">
+          <button class="step-head" data-toggle="${i}" aria-expanded="${i === openStep}">
+            <span class="step-number">${state === 'done' ? '✓' : state === 'skipped' ? '↷' : i+1}</span>
+            <span><h3 class="step-title">${title}</h3><span class="step-meta">${cells} · ${state === 'done' ? 'Complete' : state === 'skipped' ? 'Skipped — return when ready' : 'Ready to explore'}</span></span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="step-body">
+            <div class="why"><strong>Why this matters</strong>${why}</div>
+            <div class="detail-grid">
+              <div class="detail"><h4>In the notebook</h4><p>${action}</p></div>
+              <div class="detail"><h4>Evidence to look for</h4><p>${evidence}</p></div>
+            </div>
+            <div class="checkpoint"><b>Pause and predict:</b> ${prompt}</div>
+            <details class="code"><summary>Show generic anchor code</summary><pre><code>${escapeHtml(code)}</code></pre></details>
+            <label class="note-label" for="note-${i}">Your evidence or interpretation</label>
+            <textarea id="note-${i}" data-note="${i}" placeholder="Record what the output tells you—not just the number.">${escapeHtml(notes[i] || '')}</textarea>
+            <div class="actions">
+              <button class="btn primary" data-complete="${i}">${state === 'done' ? 'Mark as not complete' : 'Mark complete'}</button>
+              <button class="btn skip" data-skip="${i}">${state === 'skipped' ? 'Return to theme' : 'Skip for now'}</button>
+              ${i > 0 ? `<button class="btn secondary" data-nav="${i-1}">Previous</button>` : ''}
+              ${i < session.steps.length - 1 ? `<button class="btn secondary" data-nav="${i+1}">Next theme</button>` : ''}
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+      document.getElementById('completion-copy').textContent = session.complete;
+      updateProgress();
+      bindEvents();
+    }
+
+    function updateProgress() {
+      const session = sessions[activeSession];
+      const status = readObject('status');
+      const done = Object.values(status).filter(v => v === 'done').length;
+      const percent = Math.round(done / session.steps.length * 100);
+      document.getElementById('progress-label').textContent = `${done} of ${session.steps.length} themes complete`;
+      document.getElementById('progress-percent').textContent = `${percent}%`;
+      document.getElementById('progress-fill').style.width = `${percent}%`;
+      document.getElementById('completion').classList.toggle('show', done === session.steps.length);
+    }
+
+    function goTo(index, scroll = true) {
+      openStep = Math.max(0, Math.min(index, sessions[activeSession].steps.length - 1));
+      render();
+      if (scroll) document.getElementById(`step-${openStep}`).scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('[data-toggle]').forEach(btn => btn.addEventListener('click', () => goTo(Number(btn.dataset.toggle), false)));
+      document.querySelectorAll('[data-jump], [data-nav]').forEach(btn => btn.addEventListener('click', () => goTo(Number(btn.dataset.jump ?? btn.dataset.nav))));
+      document.querySelectorAll('[data-complete]').forEach(btn => btn.addEventListener('click', () => {
+        const i = Number(btn.dataset.complete), status = readObject('status');
+        status[i] = status[i] === 'done' ? '' : 'done'; writeObject('status', status);
+        const next = status[i] === 'done' ? Math.min(i + 1, sessions[activeSession].steps.length - 1) : i;
+        goTo(next, status[i] === 'done');
+      }));
+      document.querySelectorAll('[data-skip]').forEach(btn => btn.addEventListener('click', () => {
+        const i = Number(btn.dataset.skip), status = readObject('status');
+        status[i] = status[i] === 'skipped' ? '' : 'skipped'; writeObject('status', status);
+        goTo(status[i] === 'skipped' ? Math.min(i + 1, sessions[activeSession].steps.length - 1) : i, true);
+      }));
+      document.querySelectorAll('[data-note]').forEach(area => area.addEventListener('input', () => {
+        const notes = readObject('notes'); notes[area.dataset.note] = area.value; writeObject('notes', notes);
+      }));
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+      activeSession = tab.dataset.session; localStorage.setItem('stats-roadmap-active', activeSession); openStep = 0; render(); window.scrollTo({top: document.querySelector('.controls').offsetTop - 10, behavior:'smooth'});
+    }));
+    document.getElementById('reset-button').addEventListener('click', () => {
+      if (!confirm(`Reset progress and notes for ${sessions[activeSession].short}?`)) return;
+      localStorage.removeItem(key('status')); localStorage.removeItem(key('notes')); openStep = 0; render();
+    });
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M4.2 Practice | Statistics for Feature Selection</title>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+
+<style>
+:root{
+  --blue:#2563eb;
+  --green:#10b981;
+  --orange:#f97316;
+  --red:#dc2626;
+  --ink:#111827;
+  --muted:#475569;
+  --line:#d1d5db;
+  --soft:#f8fafc;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f3f4f6;
+  color:var(--ink);
+}
+.shell{max-width:1120px;margin:0 auto;padding:28px 18px 64px}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.title{font-size:25px;font-weight:800;margin-bottom:7px}
+.intro{color:var(--muted);line-height:1.55}
+.status{
+  margin-top:12px;padding:10px 12px;border-radius:7px;
+  background:#eff6ff;color:#1e40af
+}
+.progress-label{font-size:17px;font-weight:700;margin-bottom:10px}
+.bar{height:9px;border-radius:10px;overflow:hidden;background:#e5e7eb;margin-bottom:12px}
+.bar>div{height:100%;width:0;background:var(--blue);transition:width .25s}
+.step-row{
+  padding:9px 12px;margin-bottom:6px;border-left:4px solid var(--line);
+  border-radius:5px;background:#f9fafb;color:#6b7280
+}
+.step-row.current{border-color:#3b82f6;background:#eff6ff;color:#1e40af}
+.step-row.done{border-color:var(--green);background:#ecfdf5;color:#065f46}
+h2{margin:0 0 8px;font-size:21px}
+.instruction{color:#374151;line-height:1.55;margin-bottom:10px}
+.hint{
+  background:#f8fafc;border-left:4px solid #94a3b8;padding:10px 12px;
+  color:#475569;margin:10px 0;border-radius:5px
+}
+textarea{
+  width:100%;min-height:185px;resize:vertical;border:1px solid #9ca3af;
+  border-radius:7px;padding:12px;font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace
+}
+.buttons{display:flex;gap:8px;margin:10px 0 12px;flex-wrap:wrap}
+button{border:none;border-radius:6px;padding:10px 14px;font-weight:700;cursor:pointer}
+button.run{color:#fff;background:#16a34a}
+button.next{color:#fff;background:#0284c7}
+button.secondary{background:#e5e7eb;color:#111827}
+button:disabled{opacity:.45;cursor:not-allowed}
+.feedback{margin:8px 0;padding:10px;border-radius:6px;display:none}
+.feedback.ok{display:block;background:#ecfdf5;border-left:4px solid var(--green);color:#065f46}
+.feedback.warn{display:block;background:#fff7ed;border-left:4px solid var(--orange);color:#9a3412}
+.feedback.err{display:block;background:#fef2f2;border-left:4px solid #ef4444;color:var(--red)}
+.output-title{font-weight:800;margin:12px 0 5px}
+pre{
+  margin:0;white-space:pre-wrap;word-break:break-word;background:#0f172a;color:#e5e7eb;
+  padding:12px;min-height:70px;border-radius:7px;overflow:auto
+}
+.dataset-wrap{overflow:auto;max-height:270px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;white-space:nowrap}
+th{position:sticky;top:0;background:#f8fafc}
+.complete{background:#ecfdf5;border-left:5px solid var(--green);padding:16px;border-radius:7px}
+code{background:#f1f5f9;padding:2px 5px;border-radius:4px}
+.plot-wrap{margin-top:12px;display:none}
+.plot-wrap img{max-width:100%;border:1px solid #e5e7eb;border-radius:8px;background:white}
+.takeaway{background:#f8fafc;border-left:4px solid #3b82f6;padding:11px 13px;border-radius:5px;margin-top:10px;color:#334155}
+</style>
+</head>
+
+<body>
+<div class="shell">
+
+  <div class="card">
+    <div class="title">M4.2 Practice | Statistics for Feature Selection</div>
+    <div class="intro">
+      This practice follows the same decision pathway as the completed learner notebook, but uses a fresh synthetic university dataset.
+      Work only with the training data when making diagnostic, transformation and feature-selection decisions.
+    </div>
+    <div class="takeaway">
+      <b>Decision pathway:</b>
+      train/test split → skew &amp; kurtosis → Q–Q plot → Shapiro–Wilk &amp; K–S →
+      target transformation → one-way ANOVA → F-test feature selection inside a pipeline → unseen-data performance.
+    </div>
+    <div id="runtimeStatus" class="status">Loading Python and the practice dataset…</div>
+  </div>
+
+  <div class="card">
+    <div id="progressLabel" class="progress-label">Activity progress: 0/11</div>
+    <div class="bar"><div id="progressBar"></div></div>
+    <div id="nav"></div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:800;margin-bottom:8px">Practice dataset preview</div>
+    <div class="intro" style="margin-bottom:10px">
+      The page creates the dataset locally. The target is <code>engagement_score</code>.
+      Candidate predictors include attendance, submission, spending, prior attainment, programme and region.
+    </div>
+    <div class="dataset-wrap"><table id="datasetTable"></table></div>
+  </div>
+
+  <div id="activity" class="card"></div>
+</div>
+
+<script>
+const steps = [
+{
+  title:"1. Define the modelling question",
+  instruction:
+    "Set <code>TARGET_COLUMN</code> to <code>'engagement_score'</code>. " +
+    "Create <code>model_data</code> by removing rows where the target is missing. " +
+    "Then create <code>X_raw</code> and <code>y</code>.",
+  placeholder:
+`TARGET_COLUMN = "engagement_score"
+
+model_data = university_data.dropna(subset=[TARGET_COLUMN]).copy()
+X_raw = model_data.drop(columns=[TARGET_COLUMN])
+y = model_data[TARGET_COLUMN].copy()`,
+  validator:
+`TARGET_COLUMN == "engagement_score"
+and TARGET_COLUMN not in X_raw.columns
+and y.equals(model_data[TARGET_COLUMN])
+and len(model_data) > 0`
+},
+{
+  title:"2. Separate training and test data",
+  instruction:
+    "Split <code>X_raw</code> and <code>y</code> into <code>X_train_raw</code>, <code>X_test_raw</code>, " +
+    "<code>y_train</code> and <code>y_test</code> using <code>test_size=0.25</code> and <code>random_state=42</code>. " +
+    "The test data must remain unseen while you make the next decisions.",
+  placeholder:
+`X_train_raw, X_test_raw, y_train, y_test = train_test_split(
+    X_raw,
+    y,
+    test_size=0.25,
+    random_state=RANDOM_STATE
+)`,
+  validator:
+`len(X_train_raw) + len(X_test_raw) == len(X_raw)
+and len(y_train) == len(X_train_raw)
+and len(y_test) == len(X_test_raw)
+and len(X_test_raw) == 60`
+},
+{
+  title:"3. Measure skew and excess kurtosis",
+  instruction:
+    "Use only numerical training features. Create <code>distribution_summary</code> with columns " +
+    "<code>skew</code> and <code>excess_kurtosis</code>. Then create <code>priority_features</code> containing " +
+    "numerical features whose absolute skew is at least 1.0.",
+  hint:
+    "Skew and kurtosis describe distribution shape. They are diagnostic signals, not feature-removal rules.",
+  placeholder:
+`numeric_train = X_train_raw.select_dtypes(include="number")
+
+distribution_summary = pd.DataFrame({
+    "skew": numeric_train.skew(),
+    "excess_kurtosis": numeric_train.kurt()
+})
+
+priority_features = distribution_summary.index[
+    distribution_summary["skew"].abs() >= 1.0
+].tolist()
+
+display(distribution_summary)`,
+  validator:
+`set(["skew","excess_kurtosis"]).issubset(distribution_summary.columns)
+and set(distribution_summary.index) == set(X_train_raw.select_dtypes(include="number").columns)
+and set(priority_features) == set(distribution_summary.index[distribution_summary["skew"].abs() >= 1.0].tolist())
+and len(priority_features) >= 1`
+},
+{
+  title:"4. Inspect one priority feature with a Q–Q plot",
+  instruction:
+    "Choose the first feature in <code>priority_features</code> and store it as <code>feature</code>. " +
+    "Create <code>values</code> from the non-missing training values and draw a normal Q–Q plot with " +
+    "<code>stats.probplot(..., dist='norm', plot=plt)</code>.",
+  hint:
+    "Look for curvature, tail departures and isolated values. A Q–Q plot is a visual diagnostic, not a hypothesis test.",
+  placeholder:
+`feature = priority_features[0]
+values = pd.to_numeric(X_train_raw[feature], errors="coerce").dropna()
+
+plt.figure(figsize=(6, 5))
+stats.probplot(values, dist="norm", plot=plt)
+plt.title(f"Q-Q plot: {feature}")
+plt.tight_layout()
+plt.show()`,
+  validator:
+`feature in priority_features
+and len(values) >= 3
+and values.nunique() >= 3`
+},
+{
+  title:"5. Run Shapiro–Wilk and K–S diagnostics",
+  instruction:
+    "Use <code>values</code> from Step 4. If there are more than 5,000 observations, sample 5,000; otherwise use them all. " +
+    "Save the Shapiro–Wilk p-value as <code>shapiro_p_value</code>. Standardise the tested values, then save the " +
+    "K–S p-value as <code>ks_p_value</code>.",
+  hint:
+    "For both diagnostics, p &lt; 0.05 is evidence against normality. The K–S p-value is only an approximate teaching diagnostic because the mean and standard deviation are estimated from the same data.",
+  placeholder:
+`tested_values = values.sample(
+    min(len(values), 5000),
+    random_state=RANDOM_STATE
+)
+
+shapiro_statistic, shapiro_p_value = stats.shapiro(tested_values)
+
+standardised_values = (
+    tested_values - tested_values.mean()
+) / tested_values.std(ddof=1)
+
+ks_statistic, ks_p_value = stats.kstest(
+    standardised_values,
+    "norm"
+)
+
+print("Shapiro p-value:", shapiro_p_value)
+print("K-S p-value:", ks_p_value)`,
+  validator:
+`0 <= float(shapiro_p_value) <= 1
+and 0 <= float(ks_p_value) <= 1
+and abs(float(standardised_values.mean())) < 1e-8
+and abs(float(standardised_values.std(ddof=1)) - 1) < 1e-8`
+},
+{
+  title:"6. Check whether the target is strongly skewed",
+  instruction:
+    "Create <code>target_values</code> from <code>y_train</code> and calculate <code>target_skew</code>. " +
+    "Then create <code>target_interpretation</code> as exactly one of: <code>'roughly symmetric'</code>, " +
+    "<code>'moderately skewed'</code>, or <code>'strongly skewed'</code> using the notebook thresholds.",
+  hint:
+    "Use absolute skew: below 0.5 = roughly symmetric; 0.5 to below 1 = moderately skewed; 1 or more = strongly skewed.",
+  placeholder:
+`target_values = pd.to_numeric(y_train, errors="coerce").dropna()
+target_skew = target_values.skew()
+
+if abs(target_skew) < 0.5:
+    target_interpretation = "roughly symmetric"
+elif abs(target_skew) < 1.0:
+    target_interpretation = "moderately skewed"
+else:
+    target_interpretation = "strongly skewed"
+
+print(target_skew, target_interpretation)`,
+  validator:
+`len(target_values) == len(y_train.dropna())
+and target_interpretation in ["roughly symmetric","moderately skewed","strongly skewed"]
+and target_interpretation == (
+    "roughly symmetric" if abs(float(target_skew)) < 0.5
+    else "moderately skewed" if abs(float(target_skew)) < 1.0
+    else "strongly skewed"
+)`
+},
+{
+  title:"7. Test log1p on the target",
+  instruction:
+    "Confirm that the training target is non-negative. Create <code>log_target_values</code> with <code>np.log1p</code>. " +
+    "Calculate <code>original_skew</code> and <code>transformed_skew</code>, then build a DataFrame called " +
+    "<code>skew_comparison</code> containing both versions.",
+  hint:
+    "Reducing skew is evidence that a transformation may be useful; it is not enough by itself to justify keeping the transformation.",
+  placeholder:
+`if target_values.min() < 0:
+    raise ValueError("log1p requires a non-negative target.")
+
+log_target_values = np.log1p(target_values)
+
+original_skew = target_values.skew()
+transformed_skew = log_target_values.skew()
+
+skew_comparison = pd.DataFrame({
+    "target_version": ["original", "log1p"],
+    "skew": [original_skew, transformed_skew],
+    "absolute_skew": [abs(original_skew), abs(transformed_skew)]
+})
+
+display(skew_comparison)`,
+  validator:
+`target_values.min() >= 0
+and len(log_target_values) == len(target_values)
+and list(skew_comparison.columns) == ["target_version","skew","absolute_skew"]
+and abs(float(transformed_skew)) < abs(float(original_skew))`
+},
+{
+  title:"8. Use one-way ANOVA to screen a categorical feature",
+  instruction:
+    "Test whether mean training <code>engagement_score</code> differs across <code>programme</code> groups. " +
+    "Create <code>anova_data</code> by combining the training programme column and training target. " +
+    "Create <code>programme_groups</code>, then calculate <code>f_statistic</code> and <code>p_value</code> using " +
+    "<code>stats.f_oneway</code>.",
+  hint:
+    "ANOVA asks whether at least one group mean differs. Statistical significance does not prove causation or guarantee predictive usefulness.",
+  placeholder:
+`anova_data = pd.DataFrame({
+    "programme": X_train_raw["programme"],
+    "engagement_score": y_train
+}).dropna()
+
+programme_groups = [
+    group["engagement_score"].values
+    for _, group in anova_data.groupby("programme")
+]
+
+f_statistic, p_value = stats.f_oneway(*programme_groups)
+
+print("F-statistic:", f_statistic)
+print("p-value:", p_value)`,
+  validator:
+`len(programme_groups) == anova_data["programme"].nunique()
+and len(programme_groups) >= 2
+and float(f_statistic) >= 0
+and 0 <= float(p_value) <= 1`
+},
+{
+  title:"9. Build leakage-safe preprocessing",
+  instruction:
+    "Identify numerical and categorical features from <code>X_train_raw</code>. " +
+    "Create a numerical pipeline with median imputation and <code>StandardScaler()</code>, and a categorical pipeline with " +
+    "most-frequent imputation and <code>OneHotEncoder(handle_unknown='ignore')</code>. Combine them in " +
+    "<code>preprocessor</code> using <code>ColumnTransformer</code>.",
+  hint:
+    "Fit preprocessing only through the training pipeline. Do not preprocess the full dataset before the split.",
+  placeholder:
+`numeric_features = X_train_raw.select_dtypes(include="number").columns.tolist()
+categorical_features = X_train_raw.select_dtypes(exclude="number").columns.tolist()
+
+numeric_pipeline = Pipeline([
+    ("imputer", SimpleImputer(strategy="median")),
+    ("scaler", StandardScaler())
+])
+
+categorical_pipeline = Pipeline([
+    ("imputer", SimpleImputer(strategy="most_frequent")),
+    ("encoder", OneHotEncoder(handle_unknown="ignore"))
+])
+
+preprocessor = ColumnTransformer([
+    ("numeric", numeric_pipeline, numeric_features),
+    ("categorical", categorical_pipeline, categorical_features)
+])`,
+  validator:
+`set(numeric_features) == set(X_train_raw.select_dtypes(include="number").columns)
+and set(categorical_features) == set(X_train_raw.select_dtypes(exclude="number").columns)
+and hasattr(preprocessor, "fit_transform")`
+},
+{
+  title:"10. Put the F-test selector inside the pipeline",
+  instruction:
+    "Create <code>selected_pipeline</code> with three stages: <code>preprocessor</code>, " +
+    "<code>SelectPercentile(score_func=f_regression, percentile=60)</code>, and <code>Ridge(alpha=1.0)</code>. " +
+    "Fit it using only <code>X_train_raw</code> and <code>y_train</code>.",
+  hint:
+    "The F-test selector belongs inside the pipeline so validation/test data cannot influence feature-selection scores.",
+  placeholder:
+`selected_pipeline = Pipeline([
+    ("preprocessor", preprocessor),
+    ("selector", SelectPercentile(
+        score_func=f_regression,
+        percentile=60
+    )),
+    ("model", Ridge(alpha=1.0))
+])
+
+selected_pipeline.fit(X_train_raw, y_train)`,
+  validator:
+`hasattr(selected_pipeline, "predict")
+and "selector" in selected_pipeline.named_steps
+and selected_pipeline.named_steps["selector"].percentile == 60
+and hasattr(selected_pipeline.named_steps["model"], "coef_")`
+},
+{
+  title:"11. Evaluate on unseen data and make a recommendation",
+  instruction:
+    "Predict <code>X_test_raw</code> with <code>selected_pipeline</code>. Calculate <code>test_mae</code>, " +
+    "<code>test_rmse</code> and <code>test_r2</code>. Finally create a string called <code>recommendation</code> explaining " +
+    "why unseen-data performance—not normality or statistical significance alone—should drive the final modelling decision.",
+  placeholder:
+`test_predictions = selected_pipeline.predict(X_test_raw)
+
+test_mae = mean_absolute_error(y_test, test_predictions)
+test_rmse = mean_squared_error(y_test, test_predictions) ** 0.5
+test_r2 = r2_score(y_test, test_predictions)
+
+recommendation = (
+    "Use distribution and statistical tests to guide what to investigate, "
+    "but keep feature-selection decisions only when the complete pipeline "
+    "performs well on unseen data."
+)
+
+print("MAE:", test_mae)
+print("RMSE:", test_rmse)
+print("R2:", test_r2)
+print(recommendation)`,
+  validator:
+`float(test_mae) >= 0
+and float(test_rmse) >= 0
+and -10 < float(test_r2) <= 1
+and isinstance(recommendation, str)
+and len(recommendation.strip()) >= 40`
+}
+];
+
+let currentStep = 0;
+let completed = Array(steps.length).fill(false);
+let pyodide = null;
+let ready = false;
+let sklearnReady = false;
+let statsReady = false;
+
+function escapeHtml(text){
+  return text.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+
+function renderNav(){
+  const done=completed.filter(Boolean).length;
+  document.getElementById("progressLabel").textContent=`Activity progress: ${done}/${steps.length}`;
+  document.getElementById("progressBar").style.width=`${Math.round(done/steps.length*100)}%`;
+  document.getElementById("nav").innerHTML=steps.map((s,i)=>{
+    const cls=completed[i]?"done":(i===currentStep?"current":"");
+    const symbol=completed[i]?"✅":(i===currentStep?"▶":"○");
+    return `<div class="step-row ${cls}">${symbol} ${s.title}</div>`;
+  }).join("");
+}
+
+function renderStep(){
+  renderNav();
+  const area=document.getElementById("activity");
+
+  if(currentStep>=steps.length){
+    area.innerHTML=`
+      <div class="complete">
+        <b>✅ Practice complete</b><br>
+        You followed the complete feature-selection reasoning pathway from the learner notebook:
+        distribution evidence → transformation evidence → relevance evidence → leakage-safe modelling → unseen-data evaluation.
+      </div>
+      <div class="buttons">
+        <button class="secondary" onclick="restartActivity()">Restart activity</button>
+      </div>`;
+    return;
+  }
+
+  const s=steps[currentStep];
+  area.innerHTML=`
+    <h2>${s.title}</h2>
+    <div class="instruction">${s.instruction}</div>
+    ${s.hint?`<div class="hint">${s.hint}</div>`:""}
+    <textarea id="codeInput" spellcheck="false" placeholder="${escapeHtml(s.placeholder)}"></textarea>
+    <div class="buttons">
+      <button id="runBtn" class="run" onclick="runStep()" ${ready?"":"disabled"}>Run step</button>
+      <button id="nextBtn" class="next" onclick="nextStep()" disabled>
+        ${currentStep===steps.length-1?"Finish activity":"Next step"}
+      </button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+    <div class="output-title">Output</div>
+    <pre id="output">${ready?"Ready.":"Python runtime is loading…"}</pre>
+    <div id="plotWrap" class="plot-wrap">
+      <div class="output-title">Plot</div>
+      <img id="plotImage" alt="Python plot output">
+    </div>`;
+}
+
+async function renderPlotIfPresent(){
+  try{
+    const plotData=await pyodide.runPythonAsync(`
+import io, base64
+_plot_b64 = ""
+try:
+    if plt.get_fignums():
+        _buf = io.BytesIO()
+        plt.gcf().savefig(_buf, format="png", bbox_inches="tight", dpi=120)
+        _buf.seek(0)
+        _plot_b64 = base64.b64encode(_buf.read()).decode("ascii")
+except Exception:
+    _plot_b64 = ""
+_plot_b64
+`);
+    const wrap=document.getElementById("plotWrap");
+    const img=document.getElementById("plotImage");
+    if(plotData && wrap && img){
+      img.src="data:image/png;base64,"+plotData;
+      wrap.style.display="block";
+      await pyodide.runPythonAsync("plt.close('all')");
+    }
+  }catch(_err){}
+}
+
+async function ensureStepDependencies(){
+  const status=document.getElementById("runtimeStatus");
+
+  // Step 2 and the modelling steps use scikit-learn.
+  if(currentStep >= 1 && !sklearnReady){
+    status.textContent="Loading the modelling tools for this step…";
+    await pyodide.loadPackage("scikit-learn");
+    await pyodide.runPythonAsync(`
+from sklearn.compose import ColumnTransformer
+from sklearn.feature_selection import SelectPercentile, f_regression
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+`);
+    sklearnReady=true;
+  }
+
+  // Q-Q plots, distribution tests and ANOVA use SciPy;
+  // the Q-Q plot also needs Matplotlib.
+  if(currentStep >= 3 && !statsReady){
+    status.textContent="Loading the statistical and plotting tools for this step…";
+    await pyodide.loadPackage(["scipy","matplotlib"]);
+    await pyodide.runPythonAsync(`
+import matplotlib.pyplot as plt
+from scipy import stats
+`);
+    statsReady=true;
+  }
+
+  status.textContent="Python runtime ready. Complete the steps in order.";
+}
+
+async function runStep(){
+  if(!ready)return;
+
+  const input=document.getElementById("codeInput");
+  const output=document.getElementById("output");
+  const feedback=document.getElementById("feedback");
+  const runBtn=document.getElementById("runBtn");
+  const nextBtn=document.getElementById("nextBtn");
+  const plotWrap=document.getElementById("plotWrap");
+
+  if(plotWrap)plotWrap.style.display="none";
+
+  if(!input.value.trim()){
+    feedback.className="feedback err";
+    feedback.textContent="Enter some Python code before running the step.";
+    return;
+  }
+
+  output.textContent="";
+  feedback.className="feedback";
+
+  try{
+    runBtn.disabled=true;
+    await ensureStepDependencies();
+    runBtn.disabled=false;
+
+    pyodide.setStdout({batched:s=>output.textContent+=s+"\n"});
+    pyodide.setStderr({batched:s=>output.textContent+=s+"\n"});
+
+    await pyodide.runPythonAsync(input.value);
+    await renderPlotIfPresent();
+
+    pyodide.globals.set("_validator_expr",steps[currentStep].validator);
+    const ok=pyodide.runPython(`_safe_eval_validator(_validator_expr)`);
+
+    if(ok){
+      completed[currentStep]=true;
+      feedback.className="feedback ok";
+      feedback.textContent="✅ Step completed.";
+      input.disabled=true;
+      runBtn.disabled=true;
+      nextBtn.disabled=false;
+      renderNav();
+      if(!output.textContent.trim())output.textContent="Code ran successfully.";
+    }else{
+      feedback.className="feedback warn";
+      feedback.textContent=
+        "The code ran, but it has not completed this step yet. Review the variable names and instruction, then try again.";
+      if(!output.textContent.trim())output.textContent=
+        "Code ran successfully, but validation did not pass.";
+    }
+  }catch(err){
+    feedback.className="feedback err";
+    feedback.textContent="The code could not be completed. Review the Python output and try again.";
+    output.textContent+=String(err);
+  }
+}
+
+function nextStep(){
+  if(!completed[currentStep])return;
+  currentStep+=1;
+  renderStep();
+}
+
+async function restartActivity(){
+  currentStep=0;
+  completed=Array(steps.length).fill(false);
+  await initialisePython(false);
+  renderStep();
+}
+
+function renderDataset(rows,columns){
+  const table=document.getElementById("datasetTable");
+  table.innerHTML=
+    `<thead><tr>${columns.map(c=>`<th>${c}</th>`).join("")}</tr></thead>`+
+    `<tbody>${rows.map(r=>`<tr>${columns.map(c=>`<td>${r[c]}</td>`).join("")}</tr>`).join("")}</tbody>`;
+}
+
+async function initialisePython(reset=false){
+  const status=document.getElementById("runtimeStatus");
+  ready=false;
+
+  if(!pyodide){
+    status.textContent="Starting Python…";
+    pyodide=await loadPyodide({
+      indexURL:"https://cdn.jsdelivr.net/pyodide/v0.27.7/full/"
+    });
+
+    status.textContent="Loading the practice dataset…";
+    await pyodide.loadPackage(["numpy","pandas"]);
+  }
+
+  const setup=`
+import numpy as np
+import pandas as pd
+
+RANDOM_STATE = 42
+ALPHA = 0.05
+
+def display(obj):
+    print(obj)
+
+def _safe_eval_validator(expression):
+    try:
+        # Validators are intentionally written across multiple lines.
+        # Wrapping the expression allows Python to parse line breaks
+        # between boolean conditions such as AND.
+        expression = str(expression).strip()
+        return bool(eval(f"({expression})", globals()))
+    except Exception:
+        return False
+
+rng = np.random.default_rng(42)
+n = 240
+
+programme = rng.choice(
+    ["Data Science", "AI Foundations", "Business Analytics", "Data Engineering"],
+    size=n,
+    p=[0.28, 0.25, 0.27, 0.20]
+)
+
+region = rng.choice(
+    ["London", "North", "Midlands", "South"],
+    size=n,
+    p=[0.34, 0.24, 0.20, 0.22]
+)
+
+attendance_rate = np.clip(rng.normal(80, 10, n), 35, 100)
+submission_rate = np.clip(rng.beta(7, 2, n) * 100, 20, 100)
+
+# deliberately right-skewed candidate features
+spend_per_student = rng.lognormal(mean=6.1, sigma=0.75, size=n)
+support_hours = rng.gamma(shape=1.5, scale=3.0, size=n)
+
+prior_attainment = np.clip(rng.normal(66, 11, n), 25, 98)
+cohort_size = rng.integers(18, 75, n)
+
+programme_effect_map = {
+    "Data Science": 5.0,
+    "AI Foundations": 1.5,
+    "Business Analytics": 3.0,
+    "Data Engineering": -1.5
+}
+programme_effect = pd.Series(programme).map(programme_effect_map).to_numpy()
+
+region_effect_map = {
+    "London": 2.0,
+    "North": -0.5,
+    "Midlands": 0.5,
+    "South": 1.0
+}
+region_effect = pd.Series(region).map(region_effect_map).to_numpy()
+
+# Create a positive, right-skewed regression target.
+latent = (
+    1.10
+    + 0.010 * attendance_rate
+    + 0.007 * submission_rate
+    + 0.003 * prior_attainment
+    + 0.00016 * spend_per_student
+    + 0.025 * support_hours
+    + 0.018 * programme_effect
+    + 0.012 * region_effect
+    + rng.normal(0, 0.20, n)
+)
+
+engagement_score = np.exp(latent) * 8
+
+university_data = pd.DataFrame({
+    "university_id": [f"U{i:03d}" for i in range(1, n + 1)],
+    "programme": programme,
+    "region": region,
+    "attendance_rate": attendance_rate.round(2),
+    "submission_rate": submission_rate.round(2),
+    "spend_per_student": spend_per_student.round(2),
+    "support_hours": support_hours.round(2),
+    "prior_attainment": prior_attainment.round(2),
+    "cohort_size": cohort_size,
+    "engagement_score": engagement_score.round(2)
+})
+
+# Add a small number of missing predictor values.
+for col in ["attendance_rate", "submission_rate", "spend_per_student", "support_hours"]:
+    missing_idx = rng.choice(university_data.index, size=5, replace=False)
+    university_data.loc[missing_idx, col] = np.nan
+`;
+
+  await pyodide.runPythonAsync(setup);
+
+  const previewJson=pyodide.runPython(
+    `university_data.head(8).to_json(orient="records")`
+  );
+  const colsJson=pyodide.runPython(
+    `pd.Series(university_data.columns).to_json(orient="values")`
+  );
+
+  renderDataset(JSON.parse(previewJson),JSON.parse(colsJson));
+
+  ready=true;
+  status.textContent="Python runtime ready. Complete the steps in order.";
+}
+
+(async()=>{
+  renderStep();
+  try{
+    await initialisePython(false);
+    renderStep();
+  }catch(err){
+    document.getElementById("runtimeStatus").textContent=
+      "Python could not start. The error is shown below; refresh once after checking that cdn.jsdelivr.net is accessible.";
+    document.getElementById("activity").innerHTML +=
+      `<div class="feedback err" style="display:block">${escapeHtml(String(err))}</div>`;
+  }
+})();
+</script>
+</body>
+</html>

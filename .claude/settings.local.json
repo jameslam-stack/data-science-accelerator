@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(pip install *)",
+      "Bash(pip list *)",
+      "Bash(ls -la \"/Users/james.lam/Workshops/Data Science Accelerator/AutoML/M7.4\"* 2>/dev/null || echo \"File not found at expected name\"; ls /Users/james.lam/Workshops/Data\",)",
+      "Read(//Users/james.lam/Workshops/**)"
+    ]
+  }
+}
